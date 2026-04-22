@@ -11,7 +11,15 @@ The optional arguments (`$ARGUMENTS`) are the **"Why it's here"** rationale for 
 
 ## 1. Locate the optical drive
 
-Find the block device representing the currently-loaded disc. Try `/dev/sr0` first, then `/dev/sr1`, up to `/dev/sr3`. The right device is the one that both exists and reports a non-empty label via `lsblk -o NAME,LABEL <device>`. Kernel enumeration can skip numbers after eject/reinsert cycles, so don't assume `/dev/sr0` is always correct.
+Find the block device representing the currently-loaded disc. Kernel enumeration can skip numbers after eject/reinsert cycles, so don't assume `/dev/sr0` is always correct.
+
+List what's connected with a single call:
+
+```
+lsblk -o NAME,LABEL,FSTYPE /dev/sr0 /dev/sr1 /dev/sr2 /dev/sr3
+```
+
+Missing nodes print a one-line error to stderr and are skipped; present nodes appear in the table. Pick the device that reports a non-empty `LABEL` (and usually `udf` or `iso9660` as `FSTYPE`). Do **not** wrap this in a `for … do` shell loop — a single `lsblk` invocation with all four paths is cleaner and avoids one subshell per device.
 
 If no loaded optical disc is found, stop and tell the user — do not modify `CORPUS.md`.
 
