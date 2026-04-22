@@ -15,6 +15,8 @@ The corpus is not normative — matrix256's specification is the source of truth
 | 5 | La La Land | Blu-ray | `364381f64015e1c3` |
 | 6 | Suicide Squad (theatrical) | Blu-ray | `c12f9c146f49fc43` |
 | 7 | Suicide Squad: Extended Cut | Blu-ray | `48dad7a2a1514eca` |
+| 8 | Silicon Valley S1 — Disc 1 | Blu-ray | `765a3c735a1f2a48` |
+| 9 | Silicon Valley S1 — Disc 2 | Blu-ray | `c891cc3db59097f0` |
 
 ## 1. Big Buck Bunny (Blu-ray)
 
@@ -83,6 +85,27 @@ The corpus is not normative — matrix256's specification is the source of truth
 - **Files hashed:** 86
 - **Payload:** 40.89 GB STREAM, 0 B JAR, 0 B BDJO
 - **Why it's here:** The second disc of the Suicide Squad 2-disc combo pack — same studio, same authoring house, same protection profile, same pure-HDMV style as entry 6, but carrying the extended cut. matrix256 produces a digest completely distinct from the theatrical disc (`48dad7a2…` vs `c12f9c14…`), and Warner's AACS Disc ID also differs. This is the corpus's empirical demonstration of the README's "many fingerprints per title is expected" rationale: a fingerprint identifies a specific edition, not an abstract title. Structural differences that propagate into the hashed bytes include a shifted main title index (#26 vs #27), a different file count (86 vs 88), and a 750 MB smaller payload distribution across differently-sized clips.
+
+## 8. Silicon Valley Season 1 — Disc 1 (Blu-ray)
+
+- **matrix256:** `765a3c735a1f2a486de96bdcb0f98cad314ba78c08e05eed0e3b7320ecbae248`
+- **AACS Disc ID:** `57163EBEC59D05A4A71F70723D0D6492EC5BC64A`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 2 HDMV + 79 BD-J (79 "unsupported"); main title #12
+- **Files hashed:** 56 — smallest BD in the corpus
+- **Payload:** 43.5 GB STREAM, 1.4 MB JAR
+- **Why it's here:** First TV-series disc in the corpus, addressing the README's "Box sets and TV series — empirical verification pending" Limitation. HBO-style authoring: mixed HDMV+BD-J with a lightweight Java menu layer over HDMV-driven episode playback, contrasting with Warner's pure-HDMV and Fox's pure-BD-J approaches. Many very-short (1s) playlist entries likely serve as per-episode intro cards or chapter-selection stubs.
+- **See also:** entry 9, the Disc 2 sibling from the same set, for a box-set sibling-distinction data point.
+
+## 9. Silicon Valley Season 1 — Disc 2 (Blu-ray)
+
+- **matrix256:** `c891cc3db59097f006bfdbca09fef42035898235b6e16ab5434610a1efb47d79`
+- **AACS Disc ID:** `D3915434FDCABA94F5E16BB9E5018EB7CC309F22`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 2 HDMV + 79 BD-J (79 "unsupported"); main title #14
+- **Files hashed:** 58
+- **Payload:** 22.6 GB STREAM, 1.4 MB JAR
+- **Why it's here:** The sibling of entry 8 from the same HBO box set. A single data point rather than empirical proof, but a useful one: two discs authored by the same house with identical title counts (2 HDMV + 79 BD-J both) and identical protection profile still produce cleanly distinct matrix256 digests. Structural differences that propagate into the hash: shifted main title index (#14 vs #12), slightly different clip mix (58 files vs 56), and different per-episode MPLS/CLPI content. Disc 2 carries a smaller payload (22.6 GB vs 43.5 GB), consistent with an uneven episode split across the set. More box sets would be needed to treat the "sibling discs produce distinct digests" property as confirmed rather than observed.
 
 ## Reproducing a fingerprint
 
