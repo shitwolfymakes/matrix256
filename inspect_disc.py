@@ -28,6 +28,8 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from xml.dom import minidom
+from xml.parsers.expat import ExpatError
 
 from matrix256 import (
     SelectionEntry,
@@ -337,6 +339,26 @@ def _extract_metadata(disc_type: str, mount: Path) -> dict | None:
     return None
 
 
+def _read_disc_library_xml(disc_type: str, mount: Path) -> dict | None:
+    """Read BDMV/META/DL/bdmt_eng.xml for Blu-ray discs.
+
+    Returns None for non-BD discs. For BD, always returns a dict with `found`
+    so the caller can report the absence. Independent of libbluray tooling —
+    this is just a file read.
+    """
+    if disc_type != "bluray":
+        return None
+    rel = "BDMV/META/DL/bdmt_eng.xml"
+    path = mount / "BDMV" / "META" / "DL" / "bdmt_eng.xml"
+    if not path.is_file():
+        return {"path": rel, "found": False, "content": None}
+    try:
+        content = path.read_text(encoding="utf-8", errors="replace")
+    except OSError as e:
+        return {"path": rel, "found": True, "content": None, "error": str(e)}
+    return {"path": rel, "found": True, "content": content}
+
+
 def _fmt_size(n: int) -> str:
     if n < 1024:
         return f"{n} B"
@@ -480,6 +502,28 @@ def render_metadata(md: dict | None, disc_type: str) -> list[str]:
     return []
 
 
+def _pretty_xml(content: str) -> str:
+    """Indent XML for human reading; fall back to the raw content on parse error."""
+    try:
+        dom = minidom.parseString(content)
+    except (ExpatError, ValueError):
+        return content.rstrip()
+    pretty = dom.toprettyxml(indent="  ")
+    return "\n".join(line for line in pretty.splitlines() if line.strip())
+
+
+def render_disc_library_xml(dlx: dict | None) -> list[str]:
+    if dlx is None:
+        return []
+    if not dlx.get("found"):
+        return [f"Disc library XML ({dlx['path']}): not found"]
+    header = f"Disc library XML ({dlx['path']}):"
+    if dlx.get("content") is None:
+        err = dlx.get("error") or "could not read file"
+        return [f"{header} {err}"]
+    return [header, _pretty_xml(dlx["content"])]
+
+
 def render_text(
     source: Path,
     mount: Path,
@@ -489,6 +533,7 @@ def render_text(
     fingerprint: str | None,
     metadata: dict | None = None,
     show_metadata: bool = True,
+    disc_library_xml: dict | None = None,
 ) -> str:
     lines: list[str] = []
     lines.append(f"Source:    {source}")
@@ -529,6 +574,10 @@ def render_text(
         if md_lines:
             lines.append("")
             lines.extend(md_lines)
+        dlx_lines = render_disc_library_xml(disc_library_xml)
+        if dlx_lines:
+            lines.append("")
+            lines.extend(dlx_lines)
     return "\n".join(lines)
 
 
@@ -546,6 +595,7 @@ def build_report(source: Path, mount: Path, compute: bool, include_metadata: boo
 
     fingerprint = hash_files(included) if compute and included else None
     metadata = _extract_metadata(disc_type, mount) if include_metadata else None
+    disc_library_xml = _read_disc_library_xml(disc_type, mount) if include_metadata else None
 
     return {
         "source": str(source),
@@ -560,6 +610,7 @@ def build_report(source: Path, mount: Path, compute: bool, include_metadata: boo
         ],
         "fingerprint": fingerprint,
         "metadata": metadata,
+        "disc_library_xml": disc_library_xml,
     }
 
 
@@ -577,6 +628,7 @@ def _inspect(source: Path, mount: Path, *, compute: bool, metadata: bool, as_jso
         source, mount, report["disc_type"], included, excluded,
         report["fingerprint"], report.get("metadata"),
         show_metadata=metadata,
+        disc_library_xml=report.get("disc_library_xml"),
     ))
 
 
