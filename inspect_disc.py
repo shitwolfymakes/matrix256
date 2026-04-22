@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import ast
 import contextlib
+import csv
 import json
 import re
 import shutil
@@ -192,6 +193,7 @@ def _extract_dvd_metadata(mount: Path) -> dict | None:
     out = subprocess.run(
         ["lsdvd", "-x", "-Oy", str(mount)],
         capture_output=True, text=True, check=False,
+        encoding="utf-8", errors="replace",
     )
     if out.returncode != 0 or "lsdvd = {" not in out.stdout:
         return None
@@ -253,6 +255,7 @@ def _extract_bluray_metadata(mount: Path) -> dict | None:
     info = subprocess.run(
         ["bd_info", str(mount)],
         capture_output=True, text=True, check=False,
+        encoding="utf-8", errors="replace",
     )
     if info.returncode != 0:
         return None
@@ -291,6 +294,7 @@ def _extract_bluray_metadata(mount: Path) -> dict | None:
     titles_out = subprocess.run(
         ["bd_list_titles", "-l", str(mount)],
         capture_output=True, text=True, check=False,
+        encoding="utf-8", errors="replace",
     )
     titles: list[dict] = []
     main_title = None
@@ -337,6 +341,122 @@ def _extract_metadata(disc_type: str, mount: Path) -> dict | None:
     if disc_type == "bluray":
         return _extract_bluray_metadata(mount)
     return None
+
+
+def _parse_makemkv_robot(output: str) -> dict:
+    """Parse `makemkvcon -r info` output into disc-level and per-title attribute maps.
+
+    Robot-mode lines are CSV-ish: `PREFIX:<csv fields>`. We keep CINFO
+    (disc-level) and TINFO (per-title) rows and ignore everything else; MSG
+    and SINFO lines are not needed for the title summary we surface.
+    """
+    disc: dict[int, str] = {}
+    titles: dict[int, dict[int, str]] = {}
+    for raw in output.splitlines():
+        if ":" not in raw:
+            continue
+        prefix, _, rest = raw.partition(":")
+        if prefix not in ("CINFO", "TINFO"):
+            continue
+        try:
+            fields = next(csv.reader([rest]))
+        except (csv.Error, StopIteration):
+            continue
+        if prefix == "CINFO" and len(fields) >= 3:
+            try:
+                attr_id = int(fields[0])
+            except ValueError:
+                continue
+            disc[attr_id] = fields[2]
+        elif prefix == "TINFO" and len(fields) >= 4:
+            try:
+                title_idx = int(fields[0])
+                attr_id = int(fields[1])
+            except ValueError:
+                continue
+            titles.setdefault(title_idx, {})[attr_id] = fields[3]
+    return {"disc": disc, "titles": titles}
+
+
+def _extract_makemkv_metadata(source: Path, mount: Path) -> dict | None:
+    """Run `makemkvcon -r info` against the disc and return a title summary.
+
+    Complements lsdvd / bd_info by surfacing MakeMKV's tighter title selection
+    and its main-title heuristic (useful on decoy-heavy discs). Source spec
+    depends on what the user pointed at: `dev:<device>` for block devices
+    (MakeMKV drives CSS/AACS key handshakes directly), `iso:<path>` for ISO
+    files, and `file:<mount>` for already-mounted directories. `file:<mount>`
+    can't read CSS-protected VOBs because the kernel returns EIO — the dev/iso
+    paths let MakeMKV decrypt in-process.
+    Returns None if makemkvcon is not installed or the invocation fails.
+    """
+    if shutil.which("makemkvcon") is None:
+        return None
+    if source.is_block_device():
+        spec = f"dev:{source}"
+    elif source.is_file():
+        spec = f"iso:{source}"
+    else:
+        spec = f"file:{mount}"
+    out = subprocess.run(
+        ["makemkvcon", "-r", "info", spec],
+        capture_output=True, text=True, check=False,
+        encoding="utf-8", errors="replace",
+    )
+    if out.returncode != 0:
+        return None
+    raw = _parse_makemkv_robot(out.stdout)
+    if not raw["titles"]:
+        return None
+    info: dict = {"tool": "makemkv"}
+    disc = raw["disc"]
+    if 1 in disc:
+        info["disc_kind"] = disc[1]
+    if 2 in disc:
+        info["disc_name"] = disc[2]
+    if 32 in disc:
+        info["volume_name"] = disc[32]
+    titles_out: list[dict] = []
+    for idx in sorted(raw["titles"].keys()):
+        t = raw["titles"][idx]
+        # attr 16 (SourceFileName) is populated for BD playlists (e.g. "00800.mpls")
+        # but not for DVDs; fall back to attr 24 (OriginalTitleId), which on DVDs
+        # is the original title number used by the disc author ("01" → "T01").
+        source_file = t.get(16)
+        if not source_file and 24 in t:
+            source_file = f"T{t[24]}"
+        titles_out.append({
+            "index": idx,
+            "duration": t.get(9),
+            "chapters": int(t[8]) if 8 in t and t[8].isdigit() else None,
+            "size": t.get(10),
+            "size_bytes": int(t[11]) if 11 in t and t[11].isdigit() else None,
+            "source_file": source_file,
+            "segments_count": int(t[25]) if 25 in t and t[25].isdigit() else None,
+            "output_file": t.get(27),
+            "selected": 27 in t,
+        })
+    info["titles"] = titles_out
+    selected = [t for t in titles_out if t["selected"] and t.get("duration")]
+    if selected:
+        info["main_title_index"] = max(selected, key=lambda t: _hms_to_seconds(t["duration"]))["index"]
+    return info
+
+
+def _hms_to_seconds(s: str) -> int:
+    """Parse an HH:MM:SS or MM:SS MakeMKV duration into total seconds; 0 on parse failure."""
+    try:
+        parts = [int(p) for p in s.split(":")]
+    except ValueError:
+        return 0
+    if len(parts) == 3:
+        h, m, sec = parts
+    elif len(parts) == 2:
+        h = 0
+        m, sec = parts
+    else:
+        return 0
+    return h * 3600 + m * 60 + sec
 
 
 def _read_disc_library_xml(disc_type: str, mount: Path) -> dict | None:
@@ -502,6 +622,39 @@ def render_metadata(md: dict | None, disc_type: str) -> list[str]:
     return []
 
 
+def render_metadata_makemkv(md: dict | None) -> list[str]:
+    if md is None:
+        if shutil.which("makemkvcon") is None:
+            return ["Metadata (makemkv): makemkvcon not installed"]
+        return ["Metadata (makemkv): makemkvcon failed or returned no titles"]
+    lines = [f"Metadata ({md['tool']}):"]
+    if md.get("disc_name"):
+        lines.append(f"  Disc name:      {md['disc_name']}")
+    if md.get("disc_kind"):
+        lines.append(f"  Disc kind:      {md['disc_kind']}")
+    if md.get("volume_name"):
+        lines.append(f"  Volume:         {md['volume_name']}")
+    if md.get("main_title_index") is not None:
+        lines.append(f"  Main title:     #{md['main_title_index']}")
+    titles = md.get("titles") or []
+    if titles:
+        selected = sum(1 for t in titles if t.get("selected"))
+        lines.append("")
+        lines.append(f"  Titles ({len(titles)}, {selected} selected):")
+        lines.append(f"    {'#':>3}  {'Duration':<10}  {'Ch':>3}  {'Source':<14}  {'Segs':>4}  {'Size':>10}  Sel")
+        for t in titles:
+            duration = t.get("duration") or "—"
+            chapters = t.get("chapters")
+            chapters_str = str(chapters) if chapters is not None else "—"
+            source = t.get("source_file") or "—"
+            segs = t.get("segments_count")
+            segs_str = str(segs) if segs is not None else "—"
+            size = t.get("size") or "—"
+            mark = "✓" if t.get("selected") else " "
+            lines.append(f"    {t['index']:>3}  {duration:<10}  {chapters_str:>3}  {source:<14}  {segs_str:>4}  {size:>10}  {mark}")
+    return lines
+
+
 def _pretty_xml(content: str) -> str:
     """Indent XML for human reading; fall back to the raw content on parse error."""
     try:
@@ -534,6 +687,7 @@ def render_text(
     metadata: dict | None = None,
     show_metadata: bool = True,
     disc_library_xml: dict | None = None,
+    metadata_makemkv: dict | None = None,
 ) -> str:
     lines: list[str] = []
     lines.append(f"Source:    {source}")
@@ -574,6 +728,10 @@ def render_text(
         if md_lines:
             lines.append("")
             lines.extend(md_lines)
+        mm_lines = render_metadata_makemkv(metadata_makemkv)
+        if mm_lines:
+            lines.append("")
+            lines.extend(mm_lines)
         dlx_lines = render_disc_library_xml(disc_library_xml)
         if dlx_lines:
             lines.append("")
@@ -596,6 +754,7 @@ def build_report(source: Path, mount: Path, compute: bool, include_metadata: boo
     fingerprint = hash_files(included) if compute and included else None
     metadata = _extract_metadata(disc_type, mount) if include_metadata else None
     disc_library_xml = _read_disc_library_xml(disc_type, mount) if include_metadata else None
+    metadata_makemkv = _extract_makemkv_metadata(source, mount) if include_metadata else None
 
     return {
         "source": str(source),
@@ -610,6 +769,7 @@ def build_report(source: Path, mount: Path, compute: bool, include_metadata: boo
         ],
         "fingerprint": fingerprint,
         "metadata": metadata,
+        "metadata_makemkv": metadata_makemkv,
         "disc_library_xml": disc_library_xml,
     }
 
@@ -629,6 +789,7 @@ def _inspect(source: Path, mount: Path, *, compute: bool, metadata: bool, as_jso
         report["fingerprint"], report.get("metadata"),
         show_metadata=metadata,
         disc_library_xml=report.get("disc_library_xml"),
+        metadata_makemkv=report.get("metadata_makemkv"),
     ))
 
 
