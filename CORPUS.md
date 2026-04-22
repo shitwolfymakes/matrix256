@@ -1,0 +1,97 @@
+# Evaluation corpus
+
+Discs inspected with `inspect_disc.py` to exercise matrix256 against real-world inputs. Each entry records the computed fingerprint so any reproducer can verify their implementation against a known digest.
+
+The corpus is not normative — matrix256's specification is the source of truth. These are illustrative fixtures covering open-content and commercial pressings, DVD and Blu-ray, HDMV-only and BD-J-heavy, protected and unprotected.
+
+## Summary
+
+| # | Title | Type | matrix256 (first 16) |
+|---|---|---|---|
+| 1 | Big Buck Bunny | Blu-ray | `38d3330a06917cbc` |
+| 2 | Sintel | DVD-Video | `4bba5d860a2e61b7` |
+| 3 | The Martian | Blu-ray | `0c4c94044c3309c0` |
+| 4 | The Boondock Saints | Blu-ray | `fe37e0802e514cfd` |
+| 5 | La La Land | Blu-ray | `364381f64015e1c3` |
+| 6 | Suicide Squad (theatrical) | Blu-ray | `c12f9c146f49fc43` |
+| 7 | Suicide Squad: Extended Cut | Blu-ray | `48dad7a2a1514eca` |
+
+## 1. Big Buck Bunny (Blu-ray)
+
+- **Source:** Blender Foundation, open content (https://peach.blender.org/)
+- **matrix256:** `38d3330a06917cbc1b66ec2d4c36942809071d3ee8b5c920bcc1c399a11ae3a4`
+- **AACS Disc ID:** `69C41314710953D5C34CBF0E01F20BC870CF704A`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 599 HDMV + 4 BD-J (4 "unsupported")
+- **Payload:** ~7.9 GB STREAM
+- **Why it's here:** Open content baseline. Ships an AACS directory (so libaacs surfaces a Disc ID) but isn't actually encrypted — a useful test for confirming matrix256 works identically whether or not decryption would be possible. Rich `BDMV/META/DL/bdmt_eng.xml` with named TOC entries, exercising the XML dump path in `inspect_disc.py`.
+
+## 2. Sintel (DVD-Video)
+
+- **Source:** Blender Foundation, open content (https://durian.blender.org/)
+- **matrix256:** `4bba5d860a2e61b7b93778a97c65da01347416645f6eb971a27c17000d20880d`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** The DVD counterpart to Big Buck Bunny. Exercises the DVD path of the algorithm (VIDEO_TS.IFO + VTS_NN_0.IFO selection). Open content, so the ISO can be redistributed as a test fixture.
+
+## 3. The Martian (Blu-ray)
+
+- **matrix256:** `0c4c94044c3309c077beeb7a092b8dc405de7195512cf89aaf89a9a22f96bb89`
+- **AACS Disc ID:** `C803CB1A9B5484B1B970378ED7E1D531DDB3276C`
+- **Protection:** AACS ✓, BD+ ✓, BD-J ✓
+- **Titles:** 5 HDMV + 86 BD-J (86 "unsupported"); main title #70
+- **Files hashed:** 174 (≈290 KB)
+- **Payload:** 44.51 GB STREAM, 47 MB JAR
+- **Why it's here:** Commercial AACS+BD+ reference. Dozens of 7-second BD-J decoy playlists around the real movie (main title #70) — classic anti-rip pattern. Validates that matrix256 fingerprints are reproducible on fully protected discs without needing libaacs or any decrypt pass.
+
+## 4. The Boondock Saints (Blu-ray)
+
+- **matrix256:** `fe37e0802e514cfd76543fce0aaed51d2d655787b4b0235e1258ecea5a2dc287`
+- **AACS Disc ID:** `AF3FA2FD3D2BCF0FF199D97C3BBA4EFE9BCCBB84`
+- **Protection:** AACS ✓, BD+ ✓, BD-J ✓
+- **Titles:** 0 HDMV + 81 BD-J (81 "unsupported"); main title #36
+- **Files hashed:** 78 (≈150 KB)
+- **Payload:** 41.22 GB STREAM, 48 MB JAR
+- **Why it's here:** Pure BD-J disc — zero HDMV titles, playback is entirely Java-driven. Unusual authoring pattern; useful for confirming matrix256 doesn't depend on having any HDMV Movie Object content (the file is hashed because it exists, but its semantic role is minimal).
+
+## 5. La La Land (Blu-ray)
+
+- **matrix256:** `364381f64015e1c3f22ae1b945c4f380e0ff3d2a418a654b878377666153ce05`
+- **AACS Disc ID:** `A4E972BDF029F7E4CB48D75C96B2E5FC601D5229`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 93 HDMV + 10 BD-J (10 "unsupported"); main title #193
+- **Files hashed:** 514
+- **Payload:** 45.96 GB STREAM, 25 MB JAR
+- **Why it's here:** Heavy-decoy HDMV disc — main title numbered #193 but only 103 titles exist, meaning the playlist/clip ID space is sparse (00001.mpls … 02756.clpi) with many filler entries. Largest file count in the corpus by ~3×; stress-tests ordering stability under a big, sparse numeric space. AACS without BD+ (Lionsgate).
+
+## 6. Suicide Squad (Blu-ray)
+
+- **matrix256:** `c12f9c146f49fc4352bed581f76652493697ebd6e67dff09f107c0c7995ca57d`
+- **AACS Disc ID:** `85D565E111B07F774191EF7D82E579F61D62A94C`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✗
+- **Titles:** 12 HDMV + 0 BD-J (0 "unsupported"); main title #27
+- **Files hashed:** 88
+- **Payload:** 41.63 GB STREAM, 0 B JAR, 0 B BDJO
+- **Why it's here:** Pure HDMV authoring — zero bytes in `BDMV/JAR/` and `BDMV/BDJO/`. Together with The Boondock Saints (0 HDMV + 81 BD-J) it brackets the commercial authoring spectrum, confirming matrix256 is stable across both extremes. AACS only, no BD+ (Warner).
+- **See also:** entry 7, the Extended Cut pressing from the same 2-disc combo pack, for a direct theatrical-vs-extended comparison.
+
+## 7. Suicide Squad: Extended Cut (Blu-ray)
+
+- **matrix256:** `48dad7a2a1514ecadaee160a5782562560810d37dda2c727359d3c33fc088482`
+- **AACS Disc ID:** `C4C849323E97963B49014C6F5C12159F54182B21`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✗
+- **Titles:** 12 HDMV + 0 BD-J (0 "unsupported"); main title #26
+- **Files hashed:** 86
+- **Payload:** 40.89 GB STREAM, 0 B JAR, 0 B BDJO
+- **Why it's here:** The second disc of the Suicide Squad 2-disc combo pack — same studio, same authoring house, same protection profile, same pure-HDMV style as entry 6, but carrying the extended cut. matrix256 produces a digest completely distinct from the theatrical disc (`48dad7a2…` vs `c12f9c14…`), and Warner's AACS Disc ID also differs. This is the corpus's empirical demonstration of the README's "many fingerprints per title is expected" rationale: a fingerprint identifies a specific edition, not an abstract title. Structural differences that propagate into the hashed bytes include a shifted main title index (#26 vs #27), a different file count (86 vs 88), and a 750 MB smaller payload distribution across differently-sized clips.
+
+## Reproducing a fingerprint
+
+For discs with an `.iso` available, the fingerprint is deterministic from the disc image alone:
+
+```
+python inspect_disc.py <path-to-iso>
+```
+
+For physical discs, pass the optical drive block device (`/dev/sr0`, `/dev/sr1`, …). The script loop-mounts the ISO or uses `udisksctl` to mount the block device read-only, runs selection and SHA-256, and unmounts on exit.
+
+Open-content discs (Big Buck Bunny, Sintel) are freely downloadable from their respective project pages and should produce identical fingerprints to the values recorded here.
