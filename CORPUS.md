@@ -25,6 +25,9 @@ The corpus is not normative — matrix256's specification is the source of truth
 | 15 | Andromeda S1 — Disc 4 | DVD-Video | `7459e8c79c55f3ac` |
 | 16 | No Country for Old Men / Gone Baby Gone (double feature) | Blu-ray | `795d32f567b931b1` |
 | 17 | Afro Samurai | Blu-ray | `f1e1bd8385e39c39` |
+| 18 | Four Brothers | DVD-Video | `b9b566fa01ce0730` |
+| 19 | Munich | DVD-Video | `49ff13400488f1e0` |
+| 20 | Argo | DVD-Video | `3b04b8bab8c7c50d` |
 
 ## 1. Big Buck Bunny (Blu-ray)
 
@@ -176,6 +179,24 @@ The corpus is not normative — matrix256's specification is the source of truth
 - **Files hashed:** 81
 - **Payload:** 23.21 GB STREAM, 0 B JAR, 0 B BDJO
 - **Why it's here:** This is the full series of Afro Samurai.
+
+## 18. Four Brothers (DVD-Video)
+
+- **matrix256:** `b9b566fa01ce0730783d3b051d7618db16da96b4a680ff069e6cb3f04198cf13`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** First commercial feature-film DVD in the corpus (prior commercial DVDs were TV-series box sets). Has the most VTSes (8) and the largest `VIDEO_TS.IFO` (22 KB) of any DVD in the corpus so far, exercising a broader slice of the DVD-Video navigation layout than the leaner box-set discs.
+
+## 19. Munich (DVD-Video)
+
+- **matrix256:** `49ff13400488f1e0a79c2a5360eb64abb9841c21b87999043bf5af2f79c444e9`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** Minimal-VTS commercial feature-DVD — a dual-layer (DVD9) pressing where the entire 2h43m feature plus a short trailer live in just 3 VTSes, with `VTS_01_0.IFO` at 104 KB (second-largest IFO in the DVD corpus). Contrasts with Four Brothers (entry 18, 8 VTSes) as the simple-authoring end of the commercial-feature-DVD spectrum.
+
+## 20. Argo (DVD-Video)
+
+- **matrix256:** `3b04b8bab8c7c50d54e57e06a734b2f00df4a77927c898dff389fadf5d950478`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** Second minimal-VTS commercial feature DVD in the corpus: like Munich (entry 19), a DVD9 Warner pressing with 3 VTSes and the entire feature (2h00m) living in `VTS_01`. Different `VTS_01_0.IFO` size (94 KB vs 104 KB) and different fingerprint despite the shared authoring pattern — another per-edition distinction data point. Title #5 / #6 audio-language fields carry non-UTF-8 bytes from the disc's raw IFO strings, which prompted a `errors="replace"` hardening in `inspect_disc.py`'s lsdvd subprocess decoding.
 
 ## Reproducing a fingerprint
 
