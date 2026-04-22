@@ -28,6 +28,9 @@ The corpus is not normative — matrix256's specification is the source of truth
 | 18 | Four Brothers | DVD-Video | `b9b566fa01ce0730` |
 | 19 | Munich | DVD-Video | `49ff13400488f1e0` |
 | 20 | Argo | DVD-Video | `3b04b8bab8c7c50d` |
+| 21 | American Gangster (seamless branching) | DVD-Video | `50426f73dbc0eb3b` |
+| 22 | Casablanca | DVD-Video | `8ef7dba2bdbf4ac9` |
+| 23 | Pitch Perfect (Aca-Awesome Sing-Along) | DVD-Video | `0766b920ec352286` |
 
 ## 1. Big Buck Bunny (Blu-ray)
 
@@ -197,6 +200,25 @@ The corpus is not normative — matrix256's specification is the source of truth
 - **matrix256:** `3b04b8bab8c7c50d54e57e06a734b2f00df4a77927c898dff389fadf5d950478`
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** Second minimal-VTS commercial feature DVD in the corpus: like Munich (entry 19), a DVD9 Warner pressing with 3 VTSes and the entire feature (2h00m) living in `VTS_01`. Different `VTS_01_0.IFO` size (94 KB vs 104 KB) and different fingerprint despite the shared authoring pattern — another per-edition distinction data point. Title #5 / #6 audio-language fields carry non-UTF-8 bytes from the disc's raw IFO strings, which prompted a `errors="replace"` hardening in `inspect_disc.py`'s lsdvd subprocess decoding.
+
+## 21. American Gangster (DVD-Video)
+
+- **matrix256:** `50426f73dbc0eb3b29366e73e54c76e9925944819840be6a5bccd93db51d4618`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** First seamless-branching disc in the corpus. A single VTS_01 carries the video payload for two distinct DVD titles — the 2h55m40s extended cut and the 2h36m49s theatrical cut — stitched together from different cell orderings (MakeMKV reports 30 segments per title, the classic seamless-branching signature). Exercises a DVD authoring pattern the corpus previously lacked: two alternate cuts co-resident on one disc via shared VOBs rather than separate VTSes (contrast with Suicide Squad theatrical/extended at entries 6-7, which ship on two discs).
+- **Why the tools report it as "ASDF":** Neither lsdvd, MakeMKV, nor udisksctl surface the film title — they all fall back to "ASDF" because both the VMG disc-title field (inside `VIDEO_TS.IFO`) and the UDF volume name were left as that placeholder by Universal's authoring team. DVD-Video's VMG disc-title is a studio-populated string with no functional role in playback, so it's frequently shipped blank or placeholder — which is why `inspect_disc.py` can't recover the film title from the disc alone for this pressing.
+
+## 22. Casablanca (DVD-Video)
+
+- **matrix256:** `8ef7dba2bdbf4ac926a6faedc2ad22e5bcf29e6050988f53a543e3a9b89ff04e`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** Minimum-VTS commercial feature DVD — 2 IFOs hashed (`VIDEO_TS.IFO` + one `VTS_01_0.IFO`), the fewest of any commercial feature in the corpus. The 1h42m feature, a 36m44s bonus documentary, and ~10 short supplements all live in a single `VTS_01` with a dense `VTS_01_0.IFO` (116 KB) carrying the navigation for 14 chapter-addressed titles. Warner Home Video authoring, DVD9 payload. Sharpens the sparse end of the commercial-feature-DVD structural spectrum below Munich (entry 19, 3 VTSes) and Argo (entry 20, 3 VTSes).
+
+## 23. Pitch Perfect (Aca-Awesome Sing-Along) (DVD-Video)
+
+- **matrix256:** `0766b920ec352286950fb972eddf59f2695ebfc8c698838f3a8537b209e40c81`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This is the Aca-Awesome release of Pitch Perfect. Second seamless-branching disc in the corpus, but a different flavor than American Gangster (entry 21): both branches have identical duration (1h51m38s), same source VTS, same 35-segment map — the two titles are the same film played back with different default audio/subtitle selections (regular track vs sing-along). Confirms matrix256 handles seamless-branching authoring identically regardless of whether the branches differ in runtime or only in default stream picks.
 
 ## Reproducing a fingerprint
 
