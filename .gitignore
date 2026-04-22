@@ -30,3 +30,6 @@ Thumbs.db
 
 # MCP server scratch
 sqlite_mcp_server.db
+
+# Disc images (large, not part of the spec)
+assets/
