@@ -23,6 +23,8 @@ The corpus is not normative — matrix256's specification is the source of truth
 | 13 | Andromeda S1 — Disc 2 | DVD-Video | `a67241ef1da2ea9a` |
 | 14 | Andromeda S1 — Disc 3 | DVD-Video | `d08a3e5bba2d4568` |
 | 15 | Andromeda S1 — Disc 4 | DVD-Video | `7459e8c79c55f3ac` |
+| 16 | No Country for Old Men / Gone Baby Gone (double feature) | Blu-ray | `795d32f567b931b1` |
+| 17 | Afro Samurai | Blu-ray | `f1e1bd8385e39c39` |
 
 ## 1. Big Buck Bunny (Blu-ray)
 
@@ -154,6 +156,26 @@ The corpus is not normative — matrix256's specification is the source of truth
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This is disk 4 of the Andromeda season 1 DVD box set.
 - **See also:** entries 12, 13, and 14 — the Disc 1, Disc 2, and Disc 3 siblings from the same set.
+
+## 16. No Country For Old Men / Gone Baby Gone BD (Blu-ray)
+
+- **matrix256:** `795d32f567b931b1a4d4912db10a3191ef3b2faf203283470480e13c07794241`
+- **AACS Disc ID:** `7BFBDC2177C6E3139FDE37AAF2FB424049BB654B`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✗
+- **Titles:** 26 HDMV + 0 BD-J (0 "unsupported"); main title #8
+- **Files hashed:** 28
+- **Payload:** 38.06 GB STREAM, 0 B JAR, 0 B BDJO
+- **Why it's here:** this is a double-feature bluray containing No Country for Old Men and Gone Baby Gone.
+
+## 17. Afro Samurai (Blu-ray)
+
+- **matrix256:** `f1e1bd8385e39c397dd980b7acd745d410dfdedad7adb7b3dcce8072f3a3be9e`
+- **AACS Disc ID:** `F2A6F9BBE8A7060FF0FEF1D5F9623C8D8EB20EB4`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✗
+- **Titles:** 29 HDMV + 0 BD-J (0 "unsupported"); main title #9
+- **Files hashed:** 81
+- **Payload:** 23.21 GB STREAM, 0 B JAR, 0 B BDJO
+- **Why it's here:** This is the full series of Afro Samurai.
 
 ## Reproducing a fingerprint
 
