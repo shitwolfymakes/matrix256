@@ -17,6 +17,12 @@ The corpus is not normative — matrix256's specification is the source of truth
 | 7 | Suicide Squad: Extended Cut | Blu-ray | `48dad7a2a1514eca` |
 | 8 | Silicon Valley S1 — Disc 1 | Blu-ray | `765a3c735a1f2a48` |
 | 9 | Silicon Valley S1 — Disc 2 | Blu-ray | `c891cc3db59097f0` |
+| 10 | Silicon Valley S2 — Disc 1 | DVD-Video | `a712a945fc6a406e` |
+| 11 | Silicon Valley S2 — Disc 2 | DVD-Video | `c4fff4d76b300ad0` |
+| 12 | Andromeda S1 — Disc 1 | DVD-Video | `a36d79234597315a` |
+| 13 | Andromeda S1 — Disc 2 | DVD-Video | `a67241ef1da2ea9a` |
+| 14 | Andromeda S1 — Disc 3 | DVD-Video | `d08a3e5bba2d4568` |
+| 15 | Andromeda S1 — Disc 4 | DVD-Video | `7459e8c79c55f3ac` |
 
 ## 1. Big Buck Bunny (Blu-ray)
 
@@ -106,6 +112,48 @@ The corpus is not normative — matrix256's specification is the source of truth
 - **Files hashed:** 58
 - **Payload:** 22.6 GB STREAM, 1.4 MB JAR
 - **Why it's here:** The sibling of entry 8 from the same HBO box set. A single data point rather than empirical proof, but a useful one: two discs authored by the same house with identical title counts (2 HDMV + 79 BD-J both) and identical protection profile still produce cleanly distinct matrix256 digests. Structural differences that propagate into the hash: shifted main title index (#14 vs #12), slightly different clip mix (58 files vs 56), and different per-episode MPLS/CLPI content. Disc 2 carries a smaller payload (22.6 GB vs 43.5 GB), consistent with an uneven episode split across the set. More box sets would be needed to treat the "sibling discs produce distinct digests" property as confirmed rather than observed.
+
+## 10. Silicon Valley Season 2 — Disc 1 (DVD-Video)
+
+- **matrix256:** `a712a945fc6a406e70d4c5dc8da03e9ff554c8a045748766b70f04a329a3bbc3`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This is disk 1 of the Silicon Valley season 2 DVD box set.
+- **See also:** entry 11, the Disc 2 sibling from the same set.
+
+## 11. Silicon Valley Season 2 — Disc 2 (DVD-Video)
+
+- **matrix256:** `c4fff4d76b300ad00001f82871a6cd9914331612553f073e7f2cff43b1c6fe04`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This is disk 2 of the Silicon Valley season 2 DVD box set.
+- **See also:** entry 10, the Disc 1 sibling from the same set.
+
+## 12. Andromeda Season 1 — Disc 1 (DVD-Video)
+
+- **matrix256:** `a36d79234597315a41681a494d63b56aa820db531168d2906e024f4c3da277d9`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This is disk 1 of the Andromeda season 1 DVD box set.
+- **See also:** entries 13, 14, and 15 — the Disc 2, Disc 3, and Disc 4 siblings from the same set.
+
+## 13. Andromeda Season 1 — Disc 2 (DVD-Video)
+
+- **matrix256:** `a67241ef1da2ea9af53c09396ca029537012cb5d20272095747d3d8ca18b2501`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This is disk 2 of the Andromeda season 1 DVD box set.
+- **See also:** entries 12, 14, and 15 — the Disc 1, Disc 3, and Disc 4 siblings from the same set.
+
+## 14. Andromeda Season 1 — Disc 3 (DVD-Video)
+
+- **matrix256:** `d08a3e5bba2d4568646b8f7d0518aac7a7dd390c8b127e705adbd87492acdcd5`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This is disk 3 of the Andromeda season 1 DVD box set.
+- **See also:** entries 12, 13, and 15 — the Disc 1, Disc 2, and Disc 4 siblings from the same set.
+
+## 15. Andromeda Season 1 — Disc 4 (DVD-Video)
+
+- **matrix256:** `7459e8c79c55f3ac8963447b9a04bdf738dff6cad677c833cc60f8b85f9316ee`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This is disk 4 of the Andromeda season 1 DVD box set.
+- **See also:** entries 12, 13, and 14 — the Disc 1, Disc 2, and Disc 3 siblings from the same set.
 
 ## Reproducing a fingerprint
 
