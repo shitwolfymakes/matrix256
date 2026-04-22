@@ -90,6 +90,38 @@ def _mount_loop_device(device: str) -> str:
     return m.group(1).strip()
 
 
+def _loop_is_attached(device: str) -> bool:
+    """True if the loop device still has a backing file. udisks2 sets
+    auto-clear on loops it creates, so /sys/block/loopN/loop disappears
+    when the kernel detaches the device."""
+    return Path(f"/sys/block/{device.rsplit('/', 1)[-1]}/loop").exists()
+
+
+def _cleanup_loop(device: str) -> None:
+    """Unmount the ISO and let the kernel auto-clear the loop. Some udisks2
+    polkit configurations require admin auth for loop-delete even on loops
+    the same session created, which --no-user-interaction can't satisfy; but
+    auto-clear makes loop-delete unnecessary in the common case. We only fall
+    back to an explicit loop-delete if auto-clear hasn't fired."""
+    last = None
+    for _ in range(5):
+        last = _udisks("unmount", "-b", device)
+        text = (last.stdout or "") + (last.stderr or "")
+        if last.returncode == 0 or "ot mounted" in text:
+            break
+        time.sleep(0.2)
+    if last is not None and last.returncode != 0 and "ot mounted" not in ((last.stdout or "") + (last.stderr or "")):
+        print(f"warning: failed to unmount {device}: {(last.stderr or last.stdout).strip()}", file=sys.stderr)
+        return
+    for _ in range(20):
+        if not _loop_is_attached(device):
+            return
+        time.sleep(0.1)
+    delete = _udisks("loop-delete", "-b", device)
+    if delete.returncode != 0 and _loop_is_attached(device):
+        print(f"warning: failed to detach {device}: {(delete.stderr or delete.stdout).strip()}", file=sys.stderr)
+
+
 @contextlib.contextmanager
 def loop_mount_iso(iso_path: Path):
     """Loop-mount an ISO read-only via udisksctl; unmount and detach on exit."""
@@ -108,8 +140,7 @@ def loop_mount_iso(iso_path: Path):
         mount_point = _wait_for_mount(device, timeout=5.0) or _mount_loop_device(device)
         yield Path(mount_point)
     finally:
-        _udisks("unmount", "-b", device)
-        _udisks("loop-delete", "-b", device)
+        _cleanup_loop(device)
 
 
 def _extract_dvd_metadata(mount: Path) -> dict | None:
