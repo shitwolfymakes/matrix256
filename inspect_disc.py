@@ -1,20 +1,24 @@
 """Inspect an optical disc and show what the fingerprint covers.
 
 Usage:
-    python inspect_disc.py <path> [--no-fingerprint] [--json]
+    python inspect_disc.py <path> [--no-fingerprint] [--no-metadata] [--json]
 
 <path> may be either a mounted disc directory (e.g. /media/user/DISC) or an
 ISO image file. ISO images are loop-mounted read-only via udisksctl for the
 duration of the inspection and cleaned up afterwards.
 
 Shows disc type, files included in the fingerprint (in spec order, with sizes),
-and files present but excluded by the spec (with the reason). Useful for
-verifying spec compliance on real discs and for building an evaluation corpus.
+files present but excluded by the spec (with the reason), and a MakeMKV-style
+metadata summary (titles, durations, chapters, streams). Metadata extraction
+uses lsdvd for DVDs and libbluray's bd_info/bd_list_titles for Blu-rays;
+install `lsdvd` and `libbluray-bin` to enable. Useful for verifying spec
+compliance on real discs and for building an evaluation corpus.
 """
 
 from __future__ import annotations
 
 import argparse
+import ast
 import contextlib
 import json
 import re
@@ -108,6 +112,166 @@ def loop_mount_iso(iso_path: Path):
         _udisks("loop-delete", "-b", device)
 
 
+def _extract_dvd_metadata(mount: Path) -> dict | None:
+    """Parse DVD title/chapter/stream metadata via `lsdvd -x -Oy`.
+
+    Returns None if lsdvd is not installed or fails. `-Oy` emits a Python-literal
+    dict prefixed with `lsdvd = `; we slice from the opening brace and
+    ast.literal_eval the rest. Some libdvdread warnings land on stdout, so we
+    tolerate any preamble before that marker.
+    """
+    if shutil.which("lsdvd") is None:
+        return None
+    out = subprocess.run(
+        ["lsdvd", "-x", "-Oy", str(mount)],
+        capture_output=True, text=True, check=False,
+    )
+    if out.returncode != 0 or "lsdvd = {" not in out.stdout:
+        return None
+    raw = out.stdout[out.stdout.index("lsdvd = {") + len("lsdvd = "):]
+    try:
+        parsed = ast.literal_eval(raw)
+    except (SyntaxError, ValueError):
+        return None
+
+    titles = []
+    for t in parsed.get("track", []):
+        audio = [
+            {
+                "lang": a.get("langcode") or a.get("language"),
+                "format": a.get("format"),
+                "channels": a.get("channels"),
+            }
+            for a in t.get("audio", [])
+        ]
+        subs = [
+            {"lang": s.get("langcode") or s.get("language")}
+            for s in t.get("subp", [])
+        ]
+        titles.append({
+            "index": t.get("ix"),
+            "length_seconds": t.get("length"),
+            "chapters": len(t.get("chapter", [])),
+            "format": t.get("format"),
+            "aspect": t.get("aspect"),
+            "resolution": f"{t.get('width')}x{t.get('height')}" if t.get("width") else None,
+            "audio": audio,
+            "subtitles": subs,
+        })
+    return {
+        "tool": "lsdvd",
+        "disc_title": parsed.get("title"),
+        "provider_id": parsed.get("provider_id"),
+        "longest_track": parsed.get("longest_track"),
+        "titles": titles,
+    }
+
+
+_BD_TITLE_RE = re.compile(
+    r"index:\s*(?P<index>\d+)\s+"
+    r"duration:\s*(?P<duration>\d\d:\d\d:\d\d)\s+"
+    r"chapters:\s*(?P<chapters>\d+)\s+"
+    r"angles:\s*(?P<angles>\d+)\s+"
+    r"clips:\s*(?P<clips>\d+)\s+"
+    r"\(playlist:\s*(?P<playlist>[^)]+)\)\s+"
+    r"V:(?P<v>\d+)\s+A:(?P<a>\d+)\s+PG:(?P<pg>\d+)\s+IG:(?P<ig>\d+)\s+SV:(?P<sv>\d+)\s+SA:(?P<sa>\d+)"
+)
+
+
+def _extract_bluray_metadata(mount: Path) -> dict | None:
+    """Parse BD disc and per-title metadata via bd_info + bd_list_titles."""
+    if shutil.which("bd_info") is None or shutil.which("bd_list_titles") is None:
+        return None
+
+    info = subprocess.run(
+        ["bd_info", str(mount)],
+        capture_output=True, text=True, check=False,
+    )
+    if info.returncode != 0:
+        return None
+    disc: dict = {"tool": "libbluray"}
+    toc: list[dict] = []
+    in_toc = False
+    for line in info.stdout.splitlines():
+        if ":" in line and not line.startswith("\t"):
+            key, _, value = line.partition(":")
+            k = key.strip()
+            v = value.strip()
+            if k == "HDMV titles":
+                disc["hdmv_titles"] = int(v)
+            elif k == "BD-J titles":
+                disc["bdj_titles"] = int(v)
+            elif k == "UNSUPPORTED titles":
+                disc["unsupported_titles"] = int(v)
+            elif k == "AACS detected":
+                disc["aacs"] = (v == "yes")
+            elif k == "BD+ detected":
+                disc["bdplus"] = (v == "yes")
+            elif k == "BD-J detected":
+                disc["bdj"] = (v == "yes")
+            elif k == "Disc name":
+                disc["disc_name"] = v
+            elif k == "Disc ID":
+                disc["disc_id"] = v
+            in_toc = k == "TOC count"
+        elif in_toc and line.startswith("\tTitle "):
+            m = re.match(r"\tTitle (\d+): (.+?)\s*$", line)
+            if m:
+                toc.append({"title": int(m.group(1)), "name": m.group(2)})
+    if toc:
+        disc["toc"] = toc
+
+    titles_out = subprocess.run(
+        ["bd_list_titles", "-l", str(mount)],
+        capture_output=True, text=True, check=False,
+    )
+    titles: list[dict] = []
+    main_title = None
+    if titles_out.returncode == 0:
+        lines = titles_out.stdout.splitlines()
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+            m = re.match(r"Main title:\s*(\d+)", line)
+            if m:
+                main_title = int(m.group(1))
+            tm = _BD_TITLE_RE.search(line)
+            if tm:
+                entry = {
+                    "index": int(tm["index"]),
+                    "duration": tm["duration"],
+                    "chapters": int(tm["chapters"]),
+                    "angles": int(tm["angles"]),
+                    "clips": int(tm["clips"]),
+                    "playlist": tm["playlist"],
+                    "streams": {
+                        "video": int(tm["v"]),
+                        "audio": int(tm["a"]),
+                        "subs": int(tm["pg"]),
+                        "interactive": int(tm["ig"]),
+                        "secondary_video": int(tm["sv"]),
+                        "secondary_audio": int(tm["sa"]),
+                    },
+                }
+                if i + 1 < len(lines) and lines[i + 1].startswith("\tAUD:"):
+                    entry["audio_langs"] = lines[i + 1].strip()[5:].split()
+                    i += 1
+                titles.append(entry)
+            i += 1
+    if main_title is not None:
+        disc["main_title_index"] = main_title
+    disc["titles"] = titles
+    return disc
+
+
+def _extract_metadata(disc_type: str, mount: Path) -> dict | None:
+    if disc_type == "dvd":
+        return _extract_dvd_metadata(mount)
+    if disc_type == "bluray":
+        return _extract_bluray_metadata(mount)
+    return None
+
+
 def _fmt_size(n: int) -> str:
     if n < 1024:
         return f"{n} B"
@@ -146,6 +310,111 @@ def find_bluray_exclusions(mountpoint: Path) -> list[tuple[str, int, str]]:
     return excluded
 
 
+def _fmt_hms(seconds: float) -> str:
+    total = int(round(seconds))
+    h, r = divmod(total, 3600)
+    m, s = divmod(r, 60)
+    return f"{h:02d}:{m:02d}:{s:02d}"
+
+
+def _summarize_dvd_audio(audio: list[dict]) -> str:
+    if not audio:
+        return "—"
+    from collections import Counter
+    keys = [f"{a.get('lang') or '?'}/{a.get('format') or '?'}/{a.get('channels') or '?'}ch" for a in audio]
+    counts = Counter(keys)
+    return ", ".join(f"{k}×{n}" if n > 1 else k for k, n in counts.items())
+
+
+def _summarize_dvd_subs(subs: list[dict]) -> str:
+    if not subs:
+        return "—"
+    from collections import Counter
+    langs = Counter(s.get("lang") or "?" for s in subs)
+    return ", ".join(f"{k}×{n}" if n > 1 else k for k, n in langs.items())
+
+
+def render_metadata_dvd(md: dict) -> list[str]:
+    lines = [f"Metadata ({md['tool']}):"]
+    if md.get("disc_title") and md["disc_title"] != "unknown":
+        lines.append(f"  Disc title:     {md['disc_title']}")
+    if md.get("provider_id"):
+        lines.append(f"  Provider ID:    {md['provider_id']}")
+    if md.get("longest_track"):
+        lines.append(f"  Longest track:  #{md['longest_track']}")
+    titles = md.get("titles") or []
+    if titles:
+        lines.append("")
+        lines.append(f"  Titles ({len(titles)}):")
+        lines.append(f"    {'#':>3}  {'Length':<11}  {'Ch':>3}  {'Res':<9}  {'Audio':<36}  Subs")
+        for t in titles:
+            length = _fmt_hms(t.get("length_seconds") or 0)
+            chapters = t.get("chapters") or 0
+            res = t.get("resolution") or "—"
+            audio = _summarize_dvd_audio(t.get("audio") or [])
+            subs = _summarize_dvd_subs(t.get("subtitles") or [])
+            if len(audio) > 36:
+                audio = audio[:33] + "..."
+            lines.append(f"    {t['index']:>3}  {length:<11}  {chapters:>3}  {res:<9}  {audio:<36}  {subs}")
+    return lines
+
+
+def render_metadata_bluray(md: dict) -> list[str]:
+    lines = [f"Metadata ({md['tool']}):"]
+    if md.get("disc_name"):
+        lines.append(f"  Disc name:      {md['disc_name']}")
+    if md.get("disc_id"):
+        lines.append(f"  Disc ID:        {md['disc_id']}")
+    counts = []
+    for k, label in (("hdmv_titles", "HDMV"), ("bdj_titles", "BD-J"), ("unsupported_titles", "unsupported")):
+        if k in md:
+            counts.append(f"{md[k]} {label}")
+    if counts:
+        lines.append(f"  Title counts:   {', '.join(counts)}")
+    flags = []
+    for k, label in (("aacs", "AACS"), ("bdplus", "BD+"), ("bdj", "BD-J")):
+        if k in md:
+            flags.append(f"{label}={'yes' if md[k] else 'no'}")
+    if flags:
+        lines.append(f"  Protection:     {', '.join(flags)}")
+    if md.get("main_title_index") is not None:
+        lines.append(f"  Main title:     #{md['main_title_index']}")
+    titles = md.get("titles") or []
+    if titles:
+        lines.append("")
+        lines.append(f"  Titles (≥180s, shown {len(titles)}):")
+        lines.append(f"    {'#':>3}  {'Duration':<8}  {'Ch':>3}  {'Playlist':<12}  {'V/A/Sub/IG':<12}  Audio langs")
+        for t in titles:
+            streams = t.get("streams") or {}
+            stream_str = f"{streams.get('video', 0)}/{streams.get('audio', 0)}/{streams.get('subs', 0)}/{streams.get('interactive', 0)}"
+            langs = t.get("audio_langs") or []
+            langs_str = " ".join(langs) if langs else "—"
+            if len(langs_str) > 28:
+                langs_str = langs_str[:25] + "..."
+            lines.append(f"    {t['index']:>3}  {t['duration']:<8}  {t['chapters']:>3}  {t['playlist']:<12}  {stream_str:<12}  {langs_str}")
+    toc = md.get("toc") or []
+    if toc:
+        lines.append("")
+        lines.append(f"  Disc library TOC ({len(toc)}):")
+        for entry in toc:
+            lines.append(f"    Title {entry['title']}: {entry['name']}")
+    return lines
+
+
+def render_metadata(md: dict | None, disc_type: str) -> list[str]:
+    if md is None:
+        if disc_type == "dvd":
+            return ["Metadata: lsdvd not installed or failed (apt install lsdvd)"]
+        if disc_type == "bluray":
+            return ["Metadata: libbluray tools not installed or failed (apt install libbluray-bin)"]
+        return []
+    if disc_type == "dvd":
+        return render_metadata_dvd(md)
+    if disc_type == "bluray":
+        return render_metadata_bluray(md)
+    return []
+
+
 def render_text(
     source: Path,
     mount: Path,
@@ -153,6 +422,8 @@ def render_text(
     included: list[SelectionEntry],
     excluded: list[tuple[str, int, str]],
     fingerprint: str | None,
+    metadata: dict | None = None,
+    show_metadata: bool = True,
 ) -> str:
     lines: list[str] = []
     lines.append(f"Source:    {source}")
@@ -187,10 +458,16 @@ def render_text(
         lines.append(f"Fingerprint (SHA-256): {fingerprint}")
     else:
         lines.append("Fingerprint: not computed (--no-fingerprint)")
+
+    if show_metadata:
+        md_lines = render_metadata(metadata, disc_type)
+        if md_lines:
+            lines.append("")
+            lines.extend(md_lines)
     return "\n".join(lines)
 
 
-def build_report(source: Path, mount: Path, compute: bool) -> dict:
+def build_report(source: Path, mount: Path, compute: bool, include_metadata: bool = True) -> dict:
     disc_type = detect_disc_type(mount)
     if disc_type == "dvd":
         included = select_dvd_files(mount)
@@ -203,6 +480,7 @@ def build_report(source: Path, mount: Path, compute: bool) -> dict:
         excluded = []
 
     fingerprint = hash_files(included) if compute and included else None
+    metadata = _extract_metadata(disc_type, mount) if include_metadata else None
 
     return {
         "source": str(source),
@@ -216,11 +494,12 @@ def build_report(source: Path, mount: Path, compute: bool) -> dict:
             for name, size, reason in excluded
         ],
         "fingerprint": fingerprint,
+        "metadata": metadata,
     }
 
 
-def _inspect(source: Path, mount: Path, *, compute: bool, as_json: bool) -> None:
-    report = build_report(source, mount, compute=compute)
+def _inspect(source: Path, mount: Path, *, compute: bool, metadata: bool, as_json: bool) -> None:
+    report = build_report(source, mount, compute=compute, include_metadata=metadata)
     if as_json:
         print(json.dumps(report, indent=2))
         return
@@ -229,13 +508,18 @@ def _inspect(source: Path, mount: Path, *, compute: bool, as_json: bool) -> None
         for entry in report["included"]
     ]
     excluded = [(e["path"], e["size"], e["reason"]) for e in report["excluded"]]
-    print(render_text(source, mount, report["disc_type"], included, excluded, report["fingerprint"]))
+    print(render_text(
+        source, mount, report["disc_type"], included, excluded,
+        report["fingerprint"], report.get("metadata"),
+        show_metadata=metadata,
+    ))
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Inspect what the disc fingerprint covers on a mounted optical disc or ISO image.")
     parser.add_argument("path", type=Path, help="Mounted disc directory (e.g. /media/user/DISC) or ISO file (.iso)")
     parser.add_argument("--no-fingerprint", action="store_true", help="Skip SHA-256 computation (selection only)")
+    parser.add_argument("--no-metadata", action="store_true", help="Skip title/stream metadata extraction (lsdvd / bd_info)")
     parser.add_argument("--json", action="store_true", help="Emit a machine-readable JSON report instead of text")
     args = parser.parse_args(argv)
 
@@ -244,14 +528,15 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     compute = not args.no_fingerprint
+    metadata = not args.no_metadata
 
     if args.path.is_dir():
-        _inspect(args.path, args.path, compute=compute, as_json=args.json)
+        _inspect(args.path, args.path, compute=compute, metadata=metadata, as_json=args.json)
         return 0
     if args.path.is_file():
         try:
             with loop_mount_iso(args.path) as mount:
-                _inspect(args.path, mount, compute=compute, as_json=args.json)
+                _inspect(args.path, mount, compute=compute, metadata=metadata, as_json=args.json)
         except IsoMountError as e:
             print(f"error: {e}", file=sys.stderr)
             return 2
