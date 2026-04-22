@@ -72,7 +72,7 @@ Input: a Blu-ray disc with a readable `BDMV` directory.
 3. Concatenate the raw bytes of each file. No separators.
 4. Compute the SHA-256 of the concatenated stream.
 
-Blu-ray playlist and clip info files are zero-padded numeric filenames (`00000.mpls`, `00001.mpls`, …), so lexicographic ordering is equivalent to numeric ordering. No files from `BDMV/STREAM`, `BDMV/AUXDATA`, `BDMV/BDJO`, `BDMV/JAR`, or `BDMV/META` are included. Files in `BDMV/BACKUP` are not included; like DVD `.BUP` files, they duplicate primary data.
+Blu-ray playlist and clip info files are zero-padded numeric filenames (`00000.mpls`, `00001.mpls`, …), so lexicographic ordering is equivalent to numeric ordering. No files from `BDMV/STREAM`, `BDMV/AUXDATA`, `BDMV/BDJO`, `BDMV/JAR`, or `BDMV/META` are included. Files in `BDMV/BACKUP` are not included; like DVD `.BUP` files, they duplicate primary data. The disc-root `CERTIFICATE/` directory — which holds the BD-J security root (publisher/disc ID in `id.bdmv`, X.509 root certificates for signing BD-J applications and Bonus View content, and BD-Live network credentials in `online.*`) — sits outside `BDMV/` and is therefore outside the fingerprint input set.
 
 ### Audio CD
 
@@ -154,6 +154,7 @@ For audio CDs, use any conforming implementation of MusicBrainz Disc ID (`libdis
 
 - **MusicBrainz Disc ID** ([spec](https://musicbrainz.org/doc/Disc_ID_Calculation)) — SHA-1 of a normalized audio-CD TOC. This specification adopts it unchanged for audio CDs.
 - **pydvdid** ([project](https://github.com/sjwood/pydvdid)) — CRC64 of DVD track layout derived from `VIDEO_TS.IFO`. Demonstrates the utility of a structural hash but uses a hash function with too small a collision space for a community-wide identifier.
+- **Blu-ray on-disc identifiers** — libbluray surfaces two disc IDs via `bd_info`: an AACS-derived `Disc ID` (20 bytes, obtained through libaacs from the disc's AACS material; only populated when an `AACS/` directory is present and libaacs is loaded) and a BD-J organization/disc ID pair parsed from `CERTIFICATE/id.bdmv` when the producer authored that file. Both are assigned identifiers — cryptographic or manually authored — rather than hashes of disc contents, and both may be absent on homemade or open-content discs. They identify a licensing or authoring group, not a specific structural encoding, which is the property matrix256 provides.
 - **libdvdread / libbluray** — the canonical open-source libraries for parsing DVD and Blu-ray metadata. Either can be used to implement the file reads in this specification, though direct filesystem access is sufficient.
 
 ## Repository tooling
