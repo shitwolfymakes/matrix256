@@ -3,9 +3,10 @@
 Usage:
     python inspect_disc.py <path> [--no-fingerprint] [--no-metadata] [--json]
 
-<path> may be either a mounted disc directory (e.g. /media/user/DISC) or an
-ISO image file. ISO images are loop-mounted read-only via udisksctl for the
-duration of the inspection and cleaned up afterwards.
+<path> may be a mounted disc directory (e.g. /media/user/DISC), an ISO image
+file, or a block device (e.g. /dev/sr0). ISO images are loop-mounted read-only
+via udisksctl; block devices are mounted via udisksctl if not already mounted
+by the desktop. Either way, anything the script mounted is unmounted on exit.
 
 Shows disc type, files included in the fingerprint (in spec order, with sizes),
 files present but excluded by the spec (with the reason), and a MakeMKV-style
@@ -97,21 +98,29 @@ def _loop_is_attached(device: str) -> bool:
     return Path(f"/sys/block/{device.rsplit('/', 1)[-1]}/loop").exists()
 
 
+def _udisks_unmount(device: str) -> subprocess.CompletedProcess[str]:
+    """udisksctl unmount -b <device>, retrying briefly on transient busy so
+    we don't give up just because a subprocess hasn't fully released yet."""
+    result = _udisks("unmount", "-b", device)
+    for _ in range(4):
+        text = (result.stdout or "") + (result.stderr or "")
+        if result.returncode == 0 or "ot mounted" in text:
+            return result
+        time.sleep(0.2)
+        result = _udisks("unmount", "-b", device)
+    return result
+
+
 def _cleanup_loop(device: str) -> None:
     """Unmount the ISO and let the kernel auto-clear the loop. Some udisks2
     polkit configurations require admin auth for loop-delete even on loops
     the same session created, which --no-user-interaction can't satisfy; but
     auto-clear makes loop-delete unnecessary in the common case. We only fall
     back to an explicit loop-delete if auto-clear hasn't fired."""
-    last = None
-    for _ in range(5):
-        last = _udisks("unmount", "-b", device)
-        text = (last.stdout or "") + (last.stderr or "")
-        if last.returncode == 0 or "ot mounted" in text:
-            break
-        time.sleep(0.2)
-    if last is not None and last.returncode != 0 and "ot mounted" not in ((last.stdout or "") + (last.stderr or "")):
-        print(f"warning: failed to unmount {device}: {(last.stderr or last.stdout).strip()}", file=sys.stderr)
+    result = _udisks_unmount(device)
+    text = (result.stdout or "") + (result.stderr or "")
+    if result.returncode != 0 and "ot mounted" not in text:
+        print(f"warning: failed to unmount {device}: {(result.stderr or result.stdout).strip()}", file=sys.stderr)
         return
     for _ in range(20):
         if not _loop_is_attached(device):
@@ -141,6 +150,31 @@ def loop_mount_iso(iso_path: Path):
         yield Path(mount_point)
     finally:
         _cleanup_loop(device)
+
+
+@contextlib.contextmanager
+def mount_block_device(device: Path):
+    """Mount a block device (e.g. /dev/sr0) read-only via udisksctl if not
+    already mounted, yielding the mount point. If the disc was already mounted
+    by the desktop we leave that mount alone on exit; we only unmount what
+    this function mounted."""
+    if shutil.which("udisksctl") is None:
+        raise IsoMountError(
+            "udisksctl not found — install udisks2 or mount the disc manually and pass the mount point."
+        )
+    device_str = str(device)
+    existing = _wait_for_mount(device_str, timeout=0.1)
+    if existing:
+        yield Path(existing)
+        return
+    mount_point = _mount_loop_device(device_str)
+    try:
+        yield Path(mount_point)
+    finally:
+        result = _udisks_unmount(device_str)
+        text = (result.stdout or "") + (result.stderr or "")
+        if result.returncode != 0 and "ot mounted" not in text:
+            print(f"warning: failed to unmount {device_str}: {(result.stderr or result.stdout).strip()}", file=sys.stderr)
 
 
 def _extract_dvd_metadata(mount: Path) -> dict | None:
@@ -548,7 +582,7 @@ def _inspect(source: Path, mount: Path, *, compute: bool, metadata: bool, as_jso
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Inspect what the disc fingerprint covers on a mounted optical disc or ISO image.")
-    parser.add_argument("path", type=Path, help="Mounted disc directory (e.g. /media/user/DISC) or ISO file (.iso)")
+    parser.add_argument("path", type=Path, help="Mounted disc directory (e.g. /media/user/DISC), ISO file (.iso), or block device (e.g. /dev/sr0)")
     parser.add_argument("--no-fingerprint", action="store_true", help="Skip SHA-256 computation (selection only)")
     parser.add_argument("--no-metadata", action="store_true", help="Skip title/stream metadata extraction (lsdvd / bd_info)")
     parser.add_argument("--json", action="store_true", help="Emit a machine-readable JSON report instead of text")
@@ -564,6 +598,14 @@ def main(argv: list[str] | None = None) -> int:
     if args.path.is_dir():
         _inspect(args.path, args.path, compute=compute, metadata=metadata, as_json=args.json)
         return 0
+    if args.path.is_block_device():
+        try:
+            with mount_block_device(args.path) as mount:
+                _inspect(args.path, mount, compute=compute, metadata=metadata, as_json=args.json)
+        except IsoMountError as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 2
+        return 0
     if args.path.is_file():
         try:
             with loop_mount_iso(args.path) as mount:
@@ -572,7 +614,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"error: {e}", file=sys.stderr)
             return 2
         return 0
-    print(f"error: {args.path} is neither a directory nor a regular file", file=sys.stderr)
+    print(f"error: {args.path} is not a directory, block device, or regular file", file=sys.stderr)
     return 2
 
 
