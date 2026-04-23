@@ -60,6 +60,8 @@ The corpus is not normative — matrix256's specification is the source of truth
 | 50 | Sherlock Holmes | Blu-ray | `6866e4562f5ef3e3` |
 | 51 | Sherlock Holmes: A Game of Shadows | DVD-Video | `48df27e93c8cce0c` |
 | 52 | Sherlock Holmes: A Game of Shadows | Blu-ray | `5a679c6ac6bdbec7` |
+| 53 | Star Trek | Blu-ray | `a4bd65922e6f43ea` |
+| 54 | Star Trek — Special Features | Blu-ray | `8e62efd433b4cc1b` |
 
 ## 1. Big Buck Bunny (Blu-ray)
 
@@ -477,6 +479,29 @@ The corpus is not normative — matrix256's specification is the source of truth
 - **Payload:** 35.55 GB STREAM, 29.9 MB JAR, 892 B BDJO
 - **Why it's here:** This movie is Sherlock Holmes: A Game of Shadows (2011), it is the Blu-ray disk of a Blu-ray/DVD combo pack. **New corpus record for file count hashed** — 544 files, beating La La Land's prior 514 (entry 5). Warner authoring with the same stub-objects pattern seen on the first Sherlock Holmes (entry 50): a tiny 600 B `index.bdmv` and 706 B `MovieObject.bdmv` routing 33 HDMV titles primarily through a BD-J layer. Third combo-pack cross-format sibling pair in the corpus after Whiskey Tango Foxtrot (entries 36/37) and Cowboys & Aliens (entries 38/39), this time pairing with entry 51 (the DVD side). Volume label `SHERLOCK_2` matches the "film-title + sequel-index" convention also seen at Wall Street: Money Never Sleeps (entry 49, `WALL_STREET_2`) — three data points now for this label style.
 - **See also:** entry 51, the DVD side of the same combo pack.
+
+## 53. Star Trek (Blu-ray)
+
+- **matrix256:** `a4bd65922e6f43ea7e0fdb0cd785352cee4c68acef7f55e43ed3adc0bc4c1b9b`
+- **AACS Disc ID:** `DB9E3EC5301078F3838AD6B6A1BDE03BF718A2EF`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 2 HDMV + 79 BD-J (79 "unsupported"); main title #2
+- **Files hashed:** 47
+- **Payload:** 38.67 GB STREAM, 7.6 MB JAR, 4.1 KB BDJO
+- **Why it's here:** This movie is Star Trek (2009), it is the Blu-ray disk of a Blu-ray/Special Features combo pack. This disk lists the contents as the Feature Film and Special Features. **Smallest file count for any commercial Blu-ray in the corpus** (47 files, beating Silicon Valley S1 Disc 1 at 56, entry 8) — Paramount/Bad Robot authoring routes the entire disc through a lean BDMV layout with only 22 MPLS entries and 23 CLPI entries behind a classic 2-HDMV + 79-BD-J heavy-decoy pattern (identical title-count signature to Interstellar at entry 42, another Paramount release). Main feature is title #2 at `00000.mpls`, a rare "main feature at playlist zero" choice that yields an unusually large 53.8 KB `CLIPINF/00000.clpi` (the largest CLPI in this entry). The UDF volume label is `STARTREK11D1AC` — a new label convention for the corpus: `STARTREK11` names the film by its **franchise-film number** (Star Trek 2009 is the 11th Trek feature, informally Star Trek XI), `D1` is Paramount's disc-in-set index, and `AC` likely encodes a regional or authoring-variant code. The disc also self-identifies as "Star Trek Disc 1" in libbluray / makemkv / `BDMV/META/DL/bdmt_eng.xml`, even though the user's combo-pack framing describes it as just the Blu-ray side of a Blu-ray/Special Features pairing.
+- **See also:** entry 54, which was in the same case when this set was bought secondhand. The two discs may or may not originate from the same retail pressing — see the provenance note on entry 54.
+
+## 54. Star Trek — Special Features (Blu-ray)
+
+- **matrix256:** `8e62efd433b4cc1b827acb16c08d2ec5e5c9bf41f96693e3ab5e1947e51441bb`
+- **AACS Disc ID:** `3AC37FE2F91568AF8196929D3EBCE4391A0FE5AB`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 1 HDMV + 4 BD-J (4 "unsupported"); main title #12
+- **Files hashed:** 235
+- **Payload:** 38.67 GB STREAM, 3.0 MB JAR, 518 B BDJO
+- **Why it's here:** This movie is Star Trek (2009), it is the Special Features disk of a Blu-ray/Special Features combo pack. This disk lists the contents as Special Features. Useful contrast with the Interstellar Blu-ray + bonus-disc pair at entries 42/43: where Interstellar's two discs share an essentially identical BDMV skeleton, this disc and entry 53 produce cleanly distinct layouts — entry 53 carries 47 files, this one carries **235** (a 5× file-count jump for the special-features-only disc), and their MPLS/CLPI number ranges don't overlap at all (entry 53 occupies 00000-00015 + 00998-01007; this disc occupies 00000-00083 + 00100 + 00301-00355 + 00050-00057). The UDF volume label is `STARTREKXI_D2_AC` — Roman-numeral "XI" with underscores — where entry 53's label was `STARTREK11D1AC` (Arabic-numeral "11", no underscores). The STREAM payload happens to be exactly the same 38.67 GB on both discs, likely coincidence but worth flagging.
+- **Provenance caveat:** this disc and entry 53 were together in one Blu-ray case when bought **secondhand**, so the original pressing-pairing can't be assumed. The label-format mismatch (`STARTREK11` Arabic vs `STARTREKXI` Roman; `D1AC` concatenated vs `_D2_AC` with underscores) is consistent with two discs from *different* retail SKUs that a previous owner consolidated into one case, rather than a single Paramount authoring pipeline shipping inconsistent label formats. Treat the corpus-pair framing as "these two discs currently function together as a Star Trek 2009 Blu-ray set", not as "these two discs were pressed together in one SKU."
+- **See also:** entry 53, which was in the same case when this set was bought secondhand.
 
 ## Reproducing a fingerprint
 
