@@ -39,6 +39,16 @@ The corpus is not normative — matrix256's specification is the source of truth
 | 29 | The Reading Room | DVD-Video | `111878a8ecdcc09b` |
 | 30 | The Secret | DVD-Video | `1dc7a2d76e69093e` |
 | 31 | The Endless Summer | DVD-Video | `448a1cb79358460a` |
+| 32 | Space Camp | DVD-Video | `310ac2bd337c2c73` |
+| 33 | The Adventures of Milo and Otis | DVD-Video | `0005cb727f4851ec` |
+| 34 | Space Odyssey: Voyage to the Planets | DVD-Video | `4ba6b0c730a105a1` |
+| 35 | Five Fingers | DVD-Video | `0c28f606ac8b466b` |
+| 36 | Whiskey Tango Foxtrot | DVD-Video | `68e1e31d648edc8d` |
+| 37 | Whiskey Tango Foxtrot | Blu-ray | `7520a70f5d9646d5` |
+| 38 | Cowboys & Aliens | DVD-Video | `44bb1b63ee48d1e8` |
+| 39 | Cowboys & Aliens | Blu-ray | `04c192e9e34ee28d` |
+| 40 | Life of Brian (Immaculate Edition) — Disc 1 | DVD-Video | `1391d48490beb787` |
+| 41 | Life of Brian (Immaculate Edition) — Bonus Disc | DVD-Video | `8948ddb848b10920` |
 
 ## 1. Big Buck Bunny (Blu-ray)
 
@@ -275,6 +285,81 @@ The corpus is not normative — matrix256's specification is the source of truth
 - **matrix256:** `448a1cb79358460ac3304c065868d989f03ed85de907497daf3ed43162a42bf7`
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is The Endless Summer (1966). Sixth DVD5 commercial feature in the corpus, and the first disc carrying a true **mono (1-channel) audio track** — a 1966 surf documentary preserving its original single-channel mix, where every previous corpus disc ships stereo (2ch) or 5.1 (6ch). Structurally aligned with the 3-IFO / 2-VTS template of entries 28-29 but with a larger `VTS_01_0.IFO` (80 KB, reflecting the feature's 20 chapters) and a properly-tagged `en` language code — a counter-example to the "xx" unset pattern seen on other low-budget pressings.
+
+## 32. Space Camp (DVD-Video)
+
+- **matrix256:** `310ac2bd337c2c73e03f324ee7d3514602babb2780d5f2f79af63bba875b6512`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This movie is Space Camp (1986). Seventh DVD5 commercial feature in the corpus — 3-IFO / 2-VTS layout shared with entries 28, 29, 31, but the first disc with a third-party authoring-house Provider ID (`LASERPACIFIC MEDIA CORPORATION`) rather than a studio name or a self-referential label. Minor but real axis: discs outsourced to a mastering vendor get the vendor's ID stamped into VMGI, distinct from the self-authored studio pattern (Warner Home Video etc.) and the "placeholder-equals-label" pattern of the very low-budget discs.
+
+## 33. The Adventures of Milo and Otis (DVD-Video)
+
+- **matrix256:** `0005cb727f4851ec9c6ab5467af51634d7a2c7a0ba803d06a4b9e251870ed70e`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This movie is The Adventures of Milo and Otis (1986) — specifically the American release, which is Columbia's re-cut-and-redubbed version of the 1986 Japanese film *Koneko Monogatari* (*The Adventures of Chatran*), with a shorter runtime, Dudley Moore narration, and new credits. That makes this disc a new regional-release axis: the underlying work is Japanese but the pressed edition is a distinct American derivative, with its own authoring chain and its own matrix256 digest independent of any Japanese or international pressing.
+- **Structural note:** Cleanest DVD authoring in the corpus — 2 IFOs hashed, a single VTS, a single title, no bonus/extras/menus VTS at all; just the 1h15m feature and the VMG entry. An unusual VMG-disc-title pattern too: properly populated as "The Adventures of Milo and Otis" despite the UDF volume label being a generic default `DVD_VIDEO` (contrast American Gangster at entry 21, where *both* were placeholder, and Stonehenge Apocalypse at entry 25, where both were meaningful). Ideal floor on the authoring-complexity axis.
+
+## 34. Space Odyssey: Voyage to the Planets (DVD-Video)
+
+- **matrix256:** `4ba6b0c730a105a1b2303c7b04e7d939a235939eebc1dffe3d1f43a4aec7227c`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This is the dvd release of Space Odyssey: Voyage to the Planets (2004), a two-part docu-drama. Interesting play-all authoring: the disc exposes both the individual episodes (titles #9 and #10, ~59 minutes each) and a separate concatenated 1h57m "both episodes back-to-back" title (#8, exactly twice the episode runtime). `VTS_04_0.IFO` at 178 KB is unusually large, reflecting the extra navigation tables for this compound-title arrangement. Also a new label axis: the UDF volume name and VMG disc-title are both just `E2194`, a distributor catalog/SKU number — distinct from the studio, placeholder, title-as-label, and authoring-house patterns already in the corpus.
+
+## 35. Five Fingers (DVD-Video)
+
+- **matrix256:** `0c28f606ac8b466b2e5992c495ba843b545b2a98be23835c835b908eff92c10f`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This movie is Five Fingers (2006). Eighth DVD5 commercial feature in the corpus — 7 IFOs hashed, feature in `VTS_01` (~3.7 GB, `VTS_01_0.IFO` 70 KB — same size as entry 29), with five smaller VTSes carrying menus and short extras. Partial language-code tagging (feature is `en`, most bonus titles are `xx`) — a new pattern midway between the fully-tagged and fully-placeholder DVDs earlier in the corpus.
+
+## 36. Whiskey Tango Foxtrot (DVD-Video)
+
+- **matrix256:** `68e1e31d648edc8d1c943e4b21955227e0c336782a13e12e0529d8f1de0ac12d`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This movie is Whiskey Tango Foxtrot (2015), it is the DVD disk of a DVD/Blu-ray combo pack. First "combo-pack DVD side" data point in the corpus — a modern retail pattern where the same film ships on both formats in a single SKU, and the DVD side often has lighter authoring than a standalone DVD release. Structurally a standard DVD9 feature disc (6 IFOs, feature in `VTS_05` with a 72 KB IFO spanning 8 VOBs / ~6.4 GB), with MakeMKV reporting 3 segments on the main title — likely a layer-break cell split rather than seamless-branching.
+- **See also:** entry 37, the Blu-ray side of the same combo pack — first cross-format sibling pair in the corpus.
+
+## 37. Whiskey Tango Foxtrot (Blu-ray)
+
+- **matrix256:** `7520a70f5d9646d5b9363c5001b918231a9af00e15b53e226649cde98d6ff571`
+- **AACS Disc ID:** `33BBB49A812E43775553DD8B45083CE9482AE63B`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 3 HDMV + 78 BD-J (78 "unsupported"); main title #1
+- **Files hashed:** 151
+- **Payload:** 42.37 GB STREAM, 23.7 MB JAR, 4.4 KB BDJO
+- **Why it's here:** This movie is Whiskey Tango Foxtrot (2015), it is the Blu-ray disk of a DVD/Blu-ray combo pack. Paramount-style heavy-decoy authoring (only 3 HDMV titles but 78 BD-J "unsupported" playlists salted around the real movie) matching the pattern seen at entry 3 (The Martian) and entry 4 (The Boondock Saints). Pairs with entry 36, the DVD side of the same retail SKU, to form the corpus's first cross-format sibling — same film, same release, same authoring team, two different media with completely distinct structural fingerprints.
+- **See also:** entry 36, the DVD side of the same combo pack.
+
+## 38. Cowboys & Aliens (DVD-Video)
+
+- **matrix256:** `44bb1b63ee48d1e83fd902634923ace473cb862c030046536b71f75563b9a06d`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This movie is Cowboys & Aliens (2011), it is the DVD disk of a DVD/Blu-ray combo pack. Second combo-pack DVD side in the corpus (after Whiskey Tango Foxtrot at entry 36) — same DVD9 + combo-pack authoring family but with more VTSes (9 IFOs hashed vs 6), with the feature in `VTS_08` (`VTS_08_0.IFO` 26 KB, 6.8 GB VOB span) and a dense `VTS_07_0.IFO` at 82 KB carrying the bonus-feature navigation. MakeMKV again reports 2 segments on the main title — likely the layer-break cell split consistent with entry 36's pattern.
+- **See also:** entry 39, the Blu-ray side of the same combo pack.
+
+## 39. Cowboys & Aliens (Blu-ray)
+
+- **matrix256:** `04c192e9e34ee28d765f1addb7d5268e39866e28c0634985c4fbff32a32090c5`
+- **AACS Disc ID:** `9597816567B81882E27FE5321307D50630894626`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 6 HDMV + 75 BD-J (75 "unsupported"); main title #106
+- **Files hashed:** 213
+- **Payload:** 46.05 GB STREAM, 25.5 MB JAR, 4.9 KB BDJO
+- **Why it's here:** This movie is Cowboys & Aliens (2011), it is the Blu-ray disk of a DVD/Blu-ray combo pack. Second cross-format sibling pair in the corpus — pairs with entry 38 (the DVD side of the same retail SKU) to reinforce that matrix256 distinguishes DVD and Blu-ray halves of combo packs even though the underlying film is identical. Heavy-decoy Universal-family authoring: only 6 HDMV titles but 75 BD-J "unsupported" playlists scattered throughout a sparse ID space (main title #106), echoing the pattern of entries 3 (The Martian), 4 (The Boondock Saints), and 37 (Whiskey Tango Foxtrot).
+- **See also:** entry 38, the DVD side of the same combo pack.
+
+## 40. Life of Brian (Immaculate Edition) — Disc 1 (DVD-Video)
+
+- **matrix256:** `1391d48490beb787b88ab29a9ac70a94ce8bb05bc552d56173a9d0192b6dc5fd`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This movie is The Immaculate Edition of Monty Python's Life of Brian (1979), it is the DVD disk of a DVD/Special Features combo pack. Introduces a third multi-disc-set flavor into the corpus: not a TV box (entries 8-9, 10-11, 12-15), not a cross-format combo pack (entries 36-37, 38-39), but a *main-feature + bonus-disc* two-disc pairing — both are DVDs, but only one carries the movie and the other is entirely extras. Feature in `VTS_01` (~6.4 GB, 8 VOB split, 32 chapters), DVD9. Notable label quirk: the UDF volume identifier is the multi-field string `LIFE_OF_BRIAN_DISC1` while the volume *label* read by `lsblk` is the space-containing `Life of Brian` — this surfaced a latent bug in `inspect_disc.py`'s `/dev/srN` path (udisksctl reports the mount point with `\x20` escapes for spaces, which the script currently takes literally, breaking VIDEO_TS detection; passing the already-mounted path directly works around it).
+- **See also:** entry 41, the Bonus Disc from the same set.
+
+## 41. Life of Brian (Immaculate Edition) — Bonus Disc (DVD-Video)
+
+- **matrix256:** `8948ddb848b10920e3a121b861da36c665d5be9a4e62e0887160804fd0b1a2b4`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This movie is The Immaculate Edition of Monty Python's Life of Brian (1979), it is the Special Features of a DVD/Special Features combo pack. Pairs with entry 40 as the extras-only half of the main-feature + bonus-disc arrangement — and sets a new corpus record for DVD VTS count: **14 IFOs hashed across 13 VTSes**, beating The Secret (entry 30, 12 VTSes). Bonus/special-features discs are the natural high end of this axis because each featurette or segment commonly gets its own VTS. Provider ID `LIFE_OF_BRIAN_DISC2` confirms the disc's role within the set, and the VMG disc-title is set to the full "Life of Brian: Bonus Disc" — another example of a properly-authored VMG title field.
+- **See also:** entry 40, the main feature Disc 1 from the same set.
 
 ## Reproducing a fingerprint
 
