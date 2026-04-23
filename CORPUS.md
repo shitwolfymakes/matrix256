@@ -49,6 +49,17 @@ The corpus is not normative — matrix256's specification is the source of truth
 | 39 | Cowboys & Aliens | Blu-ray | `04c192e9e34ee28d` |
 | 40 | Life of Brian (Immaculate Edition) — Disc 1 | DVD-Video | `1391d48490beb787` |
 | 41 | Life of Brian (Immaculate Edition) — Bonus Disc | DVD-Video | `8948ddb848b10920` |
+| 42 | Interstellar | Blu-ray | `4de5afe506d8237d` |
+| 43 | Interstellar Bonus Disc | Blu-ray | `644e337805e7f8c5` |
+| 44 | Hancock (theatrical + extended) | Blu-ray | `197587826e6f8878` |
+| 45 | Hancock — Digital Copy | DVD-Video | `0ac9eb0a5ef61c32` |
+| 46 | Rio | Blu-ray | `8277bdc316a3cde5` |
+| 47 | Rio — Digital Copy | Data disc | — (out of scope) |
+| 48 | The Perks of Being a Wallflower | Blu-ray | `e52e19afa45b4187` |
+| 49 | Wall Street: Money Never Sleeps | Blu-ray | `d116231aa628691e` |
+| 50 | Sherlock Holmes | Blu-ray | `6866e4562f5ef3e3` |
+| 51 | Sherlock Holmes: A Game of Shadows | DVD-Video | `48df27e93c8cce0c` |
+| 52 | Sherlock Holmes: A Game of Shadows | Blu-ray | `5a679c6ac6bdbec7` |
 
 ## 1. Big Buck Bunny (Blu-ray)
 
@@ -360,6 +371,112 @@ The corpus is not normative — matrix256's specification is the source of truth
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is The Immaculate Edition of Monty Python's Life of Brian (1979), it is the Special Features of a DVD/Special Features combo pack. Pairs with entry 40 as the extras-only half of the main-feature + bonus-disc arrangement — and sets a new corpus record for DVD VTS count: **14 IFOs hashed across 13 VTSes**, beating The Secret (entry 30, 12 VTSes). Bonus/special-features discs are the natural high end of this axis because each featurette or segment commonly gets its own VTS. Provider ID `LIFE_OF_BRIAN_DISC2` confirms the disc's role within the set, and the VMG disc-title is set to the full "Life of Brian: Bonus Disc" — another example of a properly-authored VMG title field.
 - **See also:** entry 40, the main feature Disc 1 from the same set.
+
+## 42. Interstellar (Blu-ray)
+
+- **matrix256:** `4de5afe506d8237da4ffd373fa0b074e61d66098d9b7bffdc2991e50dccee176`
+- **AACS Disc ID:** `B7D228759201D315B2294F41388450849DF3A7C3`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 2 HDMV + 79 BD-J (79 "unsupported"); main title #8
+- **Files hashed:** 54
+- **Payload:** 37.89 GB STREAM, 24.0 MB JAR, 4.1 KB BDJO
+- **Why it's here:** This movie is Interstellar (2014), it is the Blu-ray disk of a Blu-ray/Special Features combo pack. Paramount heavy-decoy authoring: only 2 HDMV titles but 79 BD-J "unsupported" playlists salted around the real movie (main title #8), matching the pattern of entries 3 (The Martian), 4 (The Boondock Saints), 37 (Whiskey Tango Foxtrot), and 39 (Cowboys & Aliens). Includes a `BDMV/META/DL/bdmt_eng.xml` disc-library record with jacket thumbnails, exercising the XML dump path — one of the few discs in the corpus to do so alongside Big Buck Bunny (entry 1).
+- **See also:** entry 43, the Bonus Disc from the same combo pack.
+
+## 43. Interstellar Bonus Disc (Blu-ray)
+
+- **matrix256:** `644e337805e7f8c5c8a5f352c1866029b56965268e5724c05753fe58ed8bafaf`
+- **AACS Disc ID:** `67FE296CE298C6A5DAB8C3AB9263CB99EA3C0023`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 2 HDMV + 79 BD-J (79 "unsupported"); main title #15
+- **Files hashed:** 92
+- **Payload:** 24.35 GB STREAM, 22.3 MB JAR, 4.1 KB BDJO
+- **Why it's here:** This movie is Interstellar (2014), it is the Special Features disk of a Blu-ray/Special Features combo pack. First main-feature + bonus-disc pair on **Blu-ray** in the corpus — pairs with entry 42 to form the Blu-ray analogue of the Life of Brian DVD pairing at entries 40/41. The bonus disc shares the main feature's exact authoring skeleton (same 00002-00077 MPLS/CLPI decoy block, same 00100/00120 menu entries, same 01000/01001 18.9 KB playlists, identical 79 BD-J "unsupported" count) but appends a dedicated 00201-00219 range carrying the real special-features content: a 50m20s primary featurette (main title #15 → `00201.mpls`) plus 18 shorter segments ranging 2m-14m. Useful empirical data for the observation that studios ship the *same* BD-J menu skeleton across both discs of a set and let the BDMV payload differ — matrix256 cleanly distinguishes them (`644e3378…` vs `4de5afe5…`) because the extra MPLS/CLPI entries propagate into the hash.
+
+## 44. Hancock (Blu-ray)
+
+- **matrix256:** `197587826e6f8878461d5c9a16bd10eb072ccaba83aed12f29844ffa1e59c2e4`
+- **AACS Disc ID:** `358B99E382B0FA7AAEB2E45246AB96CD6803E961`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 495 HDMV + 5 BD-J (5 "unsupported"); main title #161
+- **Files hashed:** 336
+- **Payload:** 42.02 GB STREAM, 6.9 MB JAR, 384 B BDJO
+- **Why it's here:** This movie is Hancock (2008), it is the Blu-ray disk of a Blu-ray/Special Features combo pack. This disk contains both theatrical and extended editions. New axes for the corpus: (1) **theatrical + extended cut on the same disc** — unlike the Suicide Squad pair at entries 6-7, where the two cuts ship as separate pressings, Hancock carries both 1h32m (theatrical) and 1h42m (extended) as adjacent HDMV titles #160-163 (two duration-variants × two angle-variants), sharing VOB cells between them; and (2) **largest HDMV title count in the corpus by a wide margin** — 495 HDMV titles versus the prior max of 93 at La La Land (entry 5) — Sony Pictures extreme-decoy authoring with hundreds of 6-second MPLS stubs. Also the first corpus disc whose libbluray-reported name carries a **™** trademark glyph (`Hancock - Blu-ray™`), a Sony-specific display-name convention.
+- **See also:** entry 45, the Digital Copy disc from the same combo pack.
+
+## 45. Hancock Bonus Disc — Digital Copy (DVD-Video)
+
+- **matrix256:** `0ac9eb0a5ef61c3265c25bb751bcb1acd19d60cccb391014e985254cfc80e29d`
+- **Structure:** DVD-Video, VIDEO_TS layout (stub) + `Movies/` directory carrying the real payload
+- **Why it's here:** This movie is Hancock (2008), it is the Digital Copy bonus disk of a Blu-ray/Digital Copy combo pack. First **Digital Copy disc** in the corpus and the first hybrid disc whose real payload lives *outside* matrix256's hashed set. The actual Digital Copy content (an 874 MB `Movies/HancockBD_2008_PC.wmv` for PC sideloading, a 727 MB `Movies/MAQ00579.MGV` for portable devices, and a `bonuscopy.exe` Windows installer with autorun) sits in the disc root under `Movies/`, while the `VIDEO_TS/` tree carries only a token 30 MB of menu/stub VOBs across 3 short titles (27s, 15s, 16s) — exactly enough to make the disc appear as a valid DVD to players that probe for `VIDEO_TS.IFO`. Useful stress test of the spec's scope: matrix256 cleanly reports a stable fingerprint (`0ac9eb0a…`) over the 4 IFO files (76 KB total) but is blind to the 1.6 GB of actual content in `Movies/`. Smallest-IFO VIDEO_TS in the corpus (previous floor: Milo and Otis at entry 33, 2 IFOs but a 2.6 GB VOB feature).
+- **See also:** entry 44, the main-feature Blu-ray side of the same combo pack.
+
+## 46. Rio (Blu-ray)
+
+- **matrix256:** `8277bdc316a3cde523b0b6a4e75251ae31613ccda12219fd637dc1d0d510587b`
+- **AACS Disc ID:** `2B04F0049EC70196BCFC2199A047A6E849B84A4F`
+- **Protection:** AACS ✓, BD+ ✓, BD-J ✓
+- **Titles:** 5 HDMV + 86 BD-J (86 "unsupported"); main title #85
+- **Files hashed:** 303
+- **Payload:** 37.25 GB STREAM, 151.5 MB JAR, 7.6 KB BDJO
+- **Why it's here:** This movie is Rio (2011), it is the Blu-ray disk of a Blu-ray/Digital Copy combo pack. Only the second AACS + BD+ + BD-J triple-protection disc in the corpus after The Martian (entry 3) — the full commercial-protection stack, not the AACS-only or AACS+BD-J flavors that dominate the rest. Also the **largest BD-J payload** in the corpus so far: 151.5 MB of `BDMV/JAR/` (previous max: The Martian at 47 MB), consistent with Fox/Blue Sky Studios' BD-Live-heavy authoring for animated releases. UDF volume label `RIO_FD` (likely "Rio Feature Disc") is another distributor-SKU-style label similar to entry 34.
+- **See also:** entry 47, the Digital Copy disc from the same combo pack.
+
+## 47. Rio Digital Copy (Data disc — out of scope)
+
+- **matrix256:** not computed — disc has no `VIDEO_TS/` or `BDMV/` directory
+- **Filesystem:** ISO 9660 (not UDF), volume label `Fox Digital Copy`
+- **Structure:** pure Windows/iTunes sideload layout — `Autorun.inf` + `Click to START.bat` at the root, a Windows-installer `DVDROM/menu.exe` (12 MB), a `DVDROM/iTunesInfo.xml` manifest, and a `DVDROM/Media/` directory carrying three video files: a 1.4 GB `FeatureMovie` (iTunes sideload), a 1.1 GB `Rio.wmv` (PC Windows Media), and a 488 MB `Rio - Portable.wmv` (portable-device Windows Media).
+- **Why it's here:** This movie is Rio (2011), it is the Digital Copy disk of a Blu-ray/Digital Copy combo pack. **First negative data point in the corpus** — the first disc that matrix256 explicitly cannot fingerprint, and a clean illustration of the spec's scope boundary. Unlike the Hancock Digital Copy (entry 45), which ships a 30 MB stub `VIDEO_TS/` and *does* produce a stable digest, Fox's Rio Digital Copy has no DVD-Video or Blu-ray directory tree at all; the disc is a conventional iso9660 data carrier for the Windows sideloading installer and its accompanying media payload. `inspect_disc.py` reports `Disc type: unknown` and `No fingerprint input files found` — the correct behavior under the current spec. Useful corpus fixture for documenting that matrix256 is not a general-purpose disc identifier: combo-pack Digital Copy sides authored as pure data discs fall entirely outside its coverage. A future revision of the spec could extend to iso9660 content hashing (e.g., hash the Media directory in canonical order), but that would be a separate algorithm, not a parameter of v1 (see the README's `format_version` rationale).
+- **See also:** entry 46, the Blu-ray side of the same combo pack.
+
+## 48. The Perks of Being a Wallflower (Blu-ray)
+
+- **matrix256:** `e52e19afa45b4187fd696aa9291d9d0099ea847d13d0bf697b1065cdb8b788e0`
+- **AACS Disc ID:** `45A6A92DF2ABCB9F12FD801942715A4262F318AF`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 1 HDMV + 2 BD-J (2 "unsupported"); main title #5
+- **Files hashed:** 115
+- **Payload:** 36.44 GB STREAM, 5.6 MB JAR, 990 B BDJO
+- **Why it's here:** This movie is The Perks of Being a Wallflower (2012). **Lowest title-object count** of any commercial Blu-ray in the corpus (1 HDMV + 2 BD-J = 3 total), but libbluray still walks 70+ playlists — a clean demonstration that BDMV object counts and MPLS counts measure different things (object = Movie Object / BD-J entrypoint; MPLS = playlist). Minimal BD-J footprint (5.6 MB JAR, 990 B BDJO) compared to the Fox/Warner BD-J-heavy discs earlier in the corpus. Summit/Lionsgate authoring with only a single pair of `00173.mpls`/`00174.mpls` and `00175.mpls`/`00176.mpls` duplicated playlists (likely a seamless-branching artifact for the special features). Second corpus disc whose libbluray display name carries a **™** glyph after Hancock (entry 44), but this is Summit Entertainment rather than Sony — the ™-in-display-name pattern is clearly multi-studio.
+
+## 49. Wall Street: Money Never Sleeps (Blu-ray)
+
+- **matrix256:** `d116231aa628691e8dfa9a480fe8f0f52f1b4982d56665d244b7d76318d01494`
+- **AACS Disc ID:** `759BE8DD378DA5CFABEFFDE04A6D1B47F1CEB466`
+- **Protection:** AACS ✓, BD+ ✓, BD-J ✓
+- **Titles:** 1 HDMV + 89 BD-J (89 "unsupported"); main title #23
+- **Files hashed:** 269
+- **Payload:** 40.46 GB STREAM, 63.9 MB JAR, 3.7 KB BDJO
+- **Why it's here:** This movie is Wall Street: Money Never Sleeps (2010). Third AACS + BD+ + BD-J triple-protection disc in the corpus after The Martian (entry 3) and Rio (entry 46) — enough data points to establish triple-protection as a real authoring pattern rather than an outlier. Sony Pictures (20th Century Fox distribution pre-merger era) BD-J-heavy authoring with 89 BD-J "unsupported" playlists behind a single HDMV entrypoint, and 63.9 MB of BD-J jars — mid-range for the heavy-BD-J studio discs (between The Martian at 47 MB and Rio at 151.5 MB). Volume label `WALL_STREET_2` is another "film-title + sequel-index" style label (the film is Wall Street's sequel; the "2" encodes that, not a disc number).
+
+## 50. Sherlock Holmes (Blu-ray)
+
+- **matrix256:** `6866e4562f5ef3e349d9688c952b59d5ad2f4d83b7a1687a250caca366cb9987`
+- **AACS Disc ID:** `0428B276B4B31A03F05E896F5BCD8251A1B583B0`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 13 HDMV + 7 BD-J (7 "unsupported"); main title #1
+- **Files hashed:** 250
+- **Payload:** 35.69 GB STREAM, 90.0 MB JAR, 664 B BDJO
+- **Why it's here:** This movie is Sherlock Holmes (2009). **Minimal MovieObject.bdmv** in the corpus at 250 bytes (alongside a 348 B `index.bdmv`) — versus the 38-99 KB seen on other HDMV-heavy discs — consistent with Warner's practice of running the disc mostly through BD-J while keeping the HDMV Movie Object stub-like. Still, 13 HDMV titles are addressable via those minimal objects, including the main feature at #1, making this a useful counterpoint to The Boondock Saints (entry 4, 0 HDMV) and the extreme-HDMV Hancock (entry 44, 495 HDMV). Second-largest BD-J jar payload in the corpus (90.0 MB, between Wall Street at 63.9 MB and Rio at 151.5 MB). Volume label carries a space (`SHERLOCK HOLMES` → `/media/wolfy/SHERLOCK HOLMES`), a live check that the udisksctl `\x20`-escape fix (committed earlier in the project) is still working.
+
+## 51. Sherlock Holmes: A Game of Shadows (DVD-Video)
+
+- **matrix256:** `48df27e93c8cce0cd3e2c25d229b20ebe0682452261d06c7c5752144ba409ef5`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This movie is Sherlock Holmes: A Game of Shadows (2011), it is the DVD disk of a Blu-ray/DVD combo pack. Third combo-pack DVD-side entry in the corpus after Whiskey Tango Foxtrot (entry 36) and Cowboys & Aliens (entry 38). Warner Home Video authoring with a DVD9 pressing (VTS_01's feature spans 7 VOBs hitting the 1 GB split boundary seven times, ~7.1 GB total), 2h08m feature in title #1, and a second (84 KB) `VTS_01_0.IFO` among the larger navigation tables in the DVD portion of the corpus. Titles 4, 5, and 9 show replacement-character audio/subtitle language tags (`��`) from non-UTF-8 bytes in the raw IFO strings — a live re-triggering of the `errors="replace"` hardening first added for Argo (entry 20). Note: despite the shared "Sherlock Holmes" franchise name, this is **not** a sibling of entry 50 (the 2009 first film is a different release on a different medium).
+- **See also:** entry 52, the Blu-ray side of the same combo pack.
+
+## 52. Sherlock Holmes: A Game of Shadows (Blu-ray)
+
+- **matrix256:** `5a679c6ac6bdbec711737c84609741f12e91cfb7578773da2e94841eb3d1631f`
+- **AACS Disc ID:** `7C9AE4D1301AF39884E662F268CC21E37DDADA1D`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 33 HDMV + 8 BD-J (8 "unsupported"); main title #28
+- **Files hashed:** 544
+- **Payload:** 35.55 GB STREAM, 29.9 MB JAR, 892 B BDJO
+- **Why it's here:** This movie is Sherlock Holmes: A Game of Shadows (2011), it is the Blu-ray disk of a Blu-ray/DVD combo pack. **New corpus record for file count hashed** — 544 files, beating La La Land's prior 514 (entry 5). Warner authoring with the same stub-objects pattern seen on the first Sherlock Holmes (entry 50): a tiny 600 B `index.bdmv` and 706 B `MovieObject.bdmv` routing 33 HDMV titles primarily through a BD-J layer. Third combo-pack cross-format sibling pair in the corpus after Whiskey Tango Foxtrot (entries 36/37) and Cowboys & Aliens (entries 38/39), this time pairing with entry 51 (the DVD side). Volume label `SHERLOCK_2` matches the "film-title + sequel-index" convention also seen at Wall Street: Money Never Sleeps (entry 49, `WALL_STREET_2`) — three data points now for this label style.
+- **See also:** entry 51, the DVD side of the same combo pack.
 
 ## Reproducing a fingerprint
 
