@@ -66,6 +66,18 @@ def _udisks(*args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
+_HEX_ESCAPE_RE = re.compile(r"\\x([0-9a-fA-F]{2})")
+
+
+def _unescape_mountpoint(s: str) -> str:
+    """Un-escape \\xHH sequences that `lsblk -nro MOUNTPOINT` and `udisksctl
+    mount` apply to paths containing spaces or other shell-unsafe characters
+    (e.g. `/media/u/Disc\\x20Name` → `/media/u/Disc Name`). Both tools use the
+    same encoding; without this the escaped string gets passed back through
+    as a literal path and downstream `VIDEO_TS`/`BDMV` detection fails."""
+    return _HEX_ESCAPE_RE.sub(lambda m: chr(int(m.group(1), 16)), s)
+
+
 def _wait_for_mount(device: str, timeout: float) -> str | None:
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
@@ -75,7 +87,7 @@ def _wait_for_mount(device: str, timeout: float) -> str | None:
         )
         mp = out.stdout.strip().splitlines()
         if mp and mp[0]:
-            return mp[0]
+            return _unescape_mountpoint(mp[0])
         time.sleep(0.1)
     return None
 
@@ -91,7 +103,7 @@ def _mount_loop_device(device: str) -> str:
     m = _MOUNT_RE.search(text)
     if not m:
         raise IsoMountError(f"could not parse mount point for {device}: {text.strip()!r}")
-    return m.group(1).strip()
+    return _unescape_mountpoint(m.group(1).strip())
 
 
 def _loop_is_attached(device: str) -> bool:
