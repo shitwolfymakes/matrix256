@@ -62,6 +62,13 @@ The corpus is not normative — matrix256's specification is the source of truth
 | 52 | Sherlock Holmes: A Game of Shadows | Blu-ray | `5a679c6ac6bdbec7` |
 | 53 | Star Trek | Blu-ray | `a4bd65922e6f43ea` |
 | 54 | Star Trek — Special Features | Blu-ray | `8e62efd433b4cc1b` |
+| 55 | Kingsman: The Secret Service | Blu-ray | `91dea3e126b1e10a` |
+| 56 | Inglourious Basterds | Blu-ray | `3f2f35622727235f` |
+| 57 | 9 (2009) | Blu-ray | `e19bb80dc86a1b00` |
+| 58 | Heat (Director's Definitive Edition) | Blu-ray | `89688ff5c1678f74` |
+| 59 | Heat DDE — Bonus Features | Blu-ray | `da8189bd93e98ebe` |
+| 60 | Venom (2018) | Blu-ray | `30155044cfc76130` |
+| 61 | Venom: Let There Be Carnage | Blu-ray | `18511045d4815122` |
 
 ## 1. Big Buck Bunny (Blu-ray)
 
@@ -256,6 +263,7 @@ The corpus is not normative — matrix256's specification is the source of truth
 - **matrix256:** `1983932253e4116af6606d4244256b1ce5d4ba0dc4cbb9686f22d8ae409ccab0`
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** Second minimum-VTS commercial feature DVD — same single-VTS Warner Home Video authoring pattern as Casablanca (entry 22), different feature (2h50m vs 1h42m), more chapters (52 vs 36), slightly smaller `VTS_01_0.IFO` (110 KB vs 116 KB), distinct fingerprint. Gives the "minimum-VTS" axis two data points across very different eras (1942 catalog release vs 1995 theatrical). Notable curiosity: the UDF volume label `HEAT_16X9LB_DUAL_LAYER_NA` encodes the aspect ratio (16:9 letterbox), disc type (DVD9 dual layer), and region (North America) directly — one of the most descriptive volume labels in the corpus.
+- **See also:** entry 58, the 2017 "Director's Definitive Edition" Blu-ray re-release of the same film — a cross-medium and cross-edition sibling.
 
 ## 25. Stonehenge Apocalypse (DVD-Video)
 
@@ -502,6 +510,78 @@ The corpus is not normative — matrix256's specification is the source of truth
 - **Why it's here:** This movie is Star Trek (2009), it is the Special Features disk of a Blu-ray/Special Features combo pack. This disk lists the contents as Special Features. Useful contrast with the Interstellar Blu-ray + bonus-disc pair at entries 42/43: where Interstellar's two discs share an essentially identical BDMV skeleton, this disc and entry 53 produce cleanly distinct layouts — entry 53 carries 47 files, this one carries **235** (a 5× file-count jump for the special-features-only disc), and their MPLS/CLPI number ranges don't overlap at all (entry 53 occupies 00000-00015 + 00998-01007; this disc occupies 00000-00083 + 00100 + 00301-00355 + 00050-00057). The UDF volume label is `STARTREKXI_D2_AC` — Roman-numeral "XI" with underscores — where entry 53's label was `STARTREK11D1AC` (Arabic-numeral "11", no underscores). The STREAM payload happens to be exactly the same 38.67 GB on both discs, likely coincidence but worth flagging.
 - **Provenance caveat:** this disc and entry 53 were together in one Blu-ray case when bought **secondhand**, so the original pressing-pairing can't be assumed. The label-format mismatch (`STARTREK11` Arabic vs `STARTREKXI` Roman; `D1AC` concatenated vs `_D2_AC` with underscores) is consistent with two discs from *different* retail SKUs that a previous owner consolidated into one case, rather than a single Paramount authoring pipeline shipping inconsistent label formats. Treat the corpus-pair framing as "these two discs currently function together as a Star Trek 2009 Blu-ray set", not as "these two discs were pressed together in one SKU."
 - **See also:** entry 53, which was in the same case when this set was bought secondhand.
+
+## 55. Kingsman: The Secret Service (Blu-ray)
+
+- **matrix256:** `91dea3e126b1e10aeedb5e162ee31eab1b27ead197a21f9cda9c6b2767bea056`
+- **AACS Disc ID:** `6B20E607ADEB48E70B4957009A7D55F77177A5C7`
+- **Protection:** AACS ✓, BD+ ✓, BD-J ✓
+- **Titles:** 5 HDMV + 86 BD-J (86 "unsupported"); main title #82
+- **Files hashed:** 194
+- **Payload:** 44.68 GB STREAM, 48.3 MB JAR, 2.7 KB BDJO
+- **Why it's here:** This movie is Kingsman: The Secret Service (2014). Fourth AACS + BD+ + BD-J triple-protection disc in the corpus after The Martian (entry 3), Rio (entry 46), and Wall Street: Money Never Sleeps (entry 49) — and the first triple-protection disc from 20th Century Fox. Paramount-style heavy-decoy authoring (5 HDMV + 86 BD-J "unsupported", main feature buried at title #82) on a large 44.68 GB payload. Two genuinely unusual `BDMV/META/DL/bdmt_eng.xml` quirks: (1) the jacket thumbnails are named `Metadata_NOT_YET_APPROVED.jpg` / `Metadata_NOT_YET_APPROVED_sml.jpg`, a clear authoring-pipeline placeholder that leaked into the pressed disc — suggesting this pressing went out before the final approved cover art was delivered; (2) the disc library TOC populates *three* title entries (`titleNumber="1"`, `"2"`, `"3"`) all with the same name "Kingsman: The Secret Service", where most corpus discs set only title 1. Second corpus disc whose UDF volume label contains a space (`Kingsman - The Secret Service`) after Sherlock Holmes (entry 50) — another live exercise of the `\x20`-escape fix in `inspect_disc.py`.
+
+## 56. Inglourious Basterds (Blu-ray)
+
+- **matrix256:** `3f2f35622727235ff8da4489154d914e791a9b64e504844c1f07649b722881d9`
+- **AACS Disc ID:** `7C7D5E77A01D02B281852AB291780D5D9099E140`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 2 HDMV + 79 BD-J (79 "unsupported"); main title #67
+- **Files hashed:** 150
+- **Payload:** 44.47 GB STREAM, 27.7 MB JAR, 5.4 KB BDJO
+- **Why it's here:** This movie is Inglorious Basterds (2009). Note the disc reports the title as "Inglourious Basterds" — Tarantino's intentional misspelling of both words — matching the film's official title rather than the common-usage spelling. The **2 HDMV + 79 BD-J title-count signature** now appears on four corpus discs (alongside Interstellar at entry 42, its Bonus Disc at entry 43, and Star Trek at entry 53), crossing Paramount (Interstellar/Star Trek) and Universal (Inglourious Basterds) — enough data points to treat 2+79 as a cross-studio authoring template, not a single-studio fingerprint. UDF volume label `ING_BASTERDS` is a new label convention for the corpus: a space-free abbreviation of the film title, distinct from the existing catalog-SKU (`E2194`), franchise-numbered (`STARTREK11D1AC`), and spelled-out-with-spaces (`Kingsman - The Secret Service`) styles.
+
+## 57. 9 (Blu-ray)
+
+- **matrix256:** `e19bb80dc86a1b00c57546959c7cac3395681fa4ccb3d7fd255de2312e4dcfda`
+- **AACS Disc ID:** `90F0D1833F56BB9E701E3820BA2C4B2E160B3A37`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 2 HDMV + 79 BD-J (79 "unsupported"); main title #41
+- **Files hashed:** 95
+- **Payload:** 29.58 GB STREAM, 18.2 MB JAR, 4.6 KB BDJO
+- **Why it's here:** This movie is 9 (2009). **Fifth corpus disc with the 2 HDMV + 79 BD-J title-count signature** (after Interstellar at entry 42, its Bonus Disc at entry 43, Star Trek at 53, and Inglourious Basterds at 56) — and the first Focus Features release to exhibit it, widening the "2+79 is a cross-studio authoring template" observation to three distinct studios. Also **the shortest disc name and UDF volume label in the corpus**: the film's title is literally the single character `9`, and the disc carries that same single character as both the libbluray/makemkv `Disc name` and the UDF volume label. Small STREAM payload for a commercial Blu-ray feature (29.58 GB, smaller than most feature-film BDs in the corpus — consistent with the film's 79-minute runtime, the shortest feature in the Blu-ray half of the corpus).
+
+## 58. Heat — Director's Definitive Edition (Blu-ray)
+
+- **matrix256:** `89688ff5c1678f74c957c05f725c0e1da218bfc0811ac12034d47a52bb7fe7f2`
+- **AACS Disc ID:** `772F1358D1D5EFEC47D05C80E4AC19F94F06D9EF`
+- **Protection:** AACS ✓, BD+ ✓, BD-J ✓
+- **Titles:** 5 HDMV + 86 BD-J (86 "unsupported"); main title #67
+- **Files hashed:** 154
+- **Payload:** 45.87 GB STREAM, 57.6 MB JAR, 3.1 KB BDJO
+- **Why it's here:** This movie is the Director's Definitive Edition of Heat (1995), it is the Blu-ray disk of a Blu-ray/Special Features combo pack. **Introduces a new sibling-relationship axis to the corpus**: cross-medium *and* cross-edition. Previous pair categories include same-edition-different-media (entries 36/37 WTF, 38/39 Cowboys & Aliens, 51/52 Sherlock 2 — all DVD/BD combo pairs), different-edition-same-medium (entries 6/7 Suicide Squad theatrical/extended, both Blu-ray), and main-feature/bonus-disc pairs (entries 40/41 Life of Brian, 42/43 Interstellar). Heat at entry 24 (standard 1995 DVD release, Warner Home Video) and this disc (2017 Director's Definitive Edition Blu-ray, Fox) share the same film but differ on both axes at once. Fifth AACS + BD+ + BD-J triple-protection disc in the corpus (after The Martian entry 3, Rio entry 46, Wall Street entry 49, Kingsman entry 55). The 5 HDMV + 86 BD-J title-count signature matches The Martian and Kingsman exactly — three data points now for this specific signature across three studios (Fox/Lionsgate/Paramount-distribution). UDF volume label `HEAT_D1` matches the Paramount-style `<TITLE>_D1` convention from Star Trek (entry 53, `STARTREK11D1AC`); the Director's Definitive Edition is indeed a 2-disc set (confirmed by entry 59), with the user's "Blu-ray/Special Features" combo-pack framing corresponding to a main-feature Blu-ray + Bonus Features Blu-ray pairing.
+- **See also:** entry 24, the 1995 standard DVD release of the same film — same film, different edition, different medium. Also entry 59, the Bonus Features disc from this same Director's Definitive Edition set.
+
+## 59. Heat — Director's Definitive Edition Bonus Features (Blu-ray)
+
+- **matrix256:** `da8189bd93e98ebee5fd48d446a1c7bca08b8a53d8e0c06d6b6c1b6aac72b886`
+- **AACS Disc ID:** `D843BBB357ED10278548030A5561A96640094772`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 5 HDMV + 86 BD-J (86 "unsupported"); main title #71
+- **Files hashed:** 228
+- **Payload:** 31.55 GB STREAM, 52.1 MB JAR, 3.1 KB BDJO
+- **Why it's here:** This movie is the Director's Definitive Edition of Heat (1995), it is the Bonus Features disk of a Blu-ray/Special Features combo pack. Third main-feature + bonus-disc Blu-ray pair in the corpus after Interstellar (entries 42/43) and Star Trek (entries 53/54). **Notable protection asymmetry** between the two discs in this set: entry 58 (main feature) carries full AACS + BD+ + BD-J triple protection, while this bonus disc ships with AACS + BD-J only (no BD+) — new data point for the corpus that **BD+ can be applied selectively within a multi-disc retail set**, presumably because BD+'s additional licensing/content-protection cost is only worth paying on the disc that carries the feature-film payload. **Same 5 HDMV + 86 BD-J title-count signature** as entry 58, and UDF label `HEAT_D2` matches the `HEAT_D1` format exactly — unlike the Star Trek pair (entries 53/54) whose two discs showed distinct title-count signatures and mismatched label formats, Paramount's Heat DDE pair is internally consistent and clearly authored as one pipeline. Both discs self-identify with distinct libbluray `Disc name` values — "Heat" and "Heat - Disc 2" — an unusual asymmetry (the first disc is unlabeled while the second carries the set-position suffix).
+- **See also:** entry 58, the main-feature Blu-ray from this same Director's Definitive Edition set.
+
+## 60. Venom (Blu-ray)
+
+- **matrix256:** `30155044cfc76130769279d45bb7449a7a6bf09a60e1c77279b161b9c661521a`
+- **AACS Disc ID:** `CE9F1725BA742084CE125EB949059150B870C2D3`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 16 HDMV + 4 BD-J (4 "unsupported"); main title #179
+- **Files hashed:** 393
+- **Payload:** 44.01 GB STREAM, 8.9 MB JAR, 838 B BDJO
+- **Why it's here:** This movie is Venom (2018). Sony/Columbia heavy-HDMV-decoy authoring — 16 HDMV + 4 BD-J with the main feature buried at title #179 in an otherwise sparse ID space — in the same family as Hancock (entry 44, 495 HDMV + 5 BD-J, main at #161) and La La Land (entry 5, 93 HDMV + 10 BD-J, main at #193). Third-largest file count in the corpus at 393, behind only Sherlock Holmes: A Game of Shadows (entry 52, 544) and La La Land (entry 5, 514). Third corpus disc whose libbluray-reported `Disc name` carries a `™` glyph after Hancock (44) and The Perks of Being a Wallflower (48), confirming the pattern is a shared "Blu-ray™" Sony/Summit/Paramount display-name convention across studios. **New non-ASCII character case**: the reported name `Venom (2018) – Blu-ray™` uses a typographic **en dash** (U+2013) as the separator between title and format, rather than the em dash (U+2014) or ASCII hyphen-minus seen elsewhere — the second distinct non-ASCII dash observed in a disc-name field, exercising the UTF-8 handling in `inspect_disc.py` without incident.
+
+## 61. Venom: Let There Be Carnage (Blu-ray)
+
+- **matrix256:** `18511045d48151227aa01aeea5b456d028c67bdabcff1edd72edaab3202bf2a9`
+- **AACS Disc ID:** `7A5CA107FEAADF04CF1731DFBF42F39EC90954A1`
+- **Protection:** AACS ✓, BD+ ✗, BD-J ✓
+- **Titles:** 17 HDMV + 3 BD-J (3 "unsupported"); main title #94
+- **Files hashed:** 396
+- **Payload:** 35.39 GB STREAM, 4.2 MB JAR, 628 B BDJO
+- **Why it's here:** This movie is Venom: Let There Be Carnage (2021). Sequel to entry 60 (same franchise, different film, distinct retail pressing with its own Disc ID and fingerprint — not a matrix256 sibling in the corpus's normal pair sense, since the two are separate films rather than same-film-different-edition/medium). Sony/Columbia authoring pattern matches Venom 1 closely — heavy-HDMV-decoy style, 17 HDMV + 3 BD-J with the main feature at title #94, and 396 files hashed versus entry 60's 393 (within 1% of each other, suggesting both discs came off Sony's common BDMV template three years apart). **Notable dash inconsistency within the Sony "Blu-ray™" display-name convention**: this disc carries name `Venom: Let There Be Carnage - Blu-ray™` using an ASCII hyphen-minus (`-`, U+002D), where entry 60 (Venom 2018) used an en dash (`–`, U+2013). Same studio, same franchise, different authoring detail — a data point that the ™-suffix convention isn't character-consistent across even a single franchise.
 
 ## Reproducing a fingerprint
 
