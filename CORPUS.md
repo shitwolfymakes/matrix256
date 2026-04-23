@@ -31,6 +31,14 @@ The corpus is not normative — matrix256's specification is the source of truth
 | 21 | American Gangster (seamless branching) | DVD-Video | `50426f73dbc0eb3b` |
 | 22 | Casablanca | DVD-Video | `8ef7dba2bdbf4ac9` |
 | 23 | Pitch Perfect (Aca-Awesome Sing-Along) | DVD-Video | `0766b920ec352286` |
+| 24 | Heat | DVD-Video | `1983932253e4116a` |
+| 25 | Stonehenge Apocalypse | DVD-Video | `5e0e5f5de53fce79` |
+| 26 | Madso's War | DVD-Video | `cbf05563e0fbf73e` |
+| 27 | VANish | DVD-Video | `e90c7a1341c8ef43` |
+| 28 | Treasure Guards | DVD-Video | `a75a01a298decf62` |
+| 29 | The Reading Room | DVD-Video | `111878a8ecdcc09b` |
+| 30 | The Secret | DVD-Video | `1dc7a2d76e69093e` |
+| 31 | The Endless Summer | DVD-Video | `448a1cb79358460a` |
 
 ## 1. Big Buck Bunny (Blu-ray)
 
@@ -219,6 +227,54 @@ The corpus is not normative — matrix256's specification is the source of truth
 - **matrix256:** `0766b920ec352286950fb972eddf59f2695ebfc8c698838f3a8537b209e40c81`
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This is the Aca-Awesome release of Pitch Perfect. Second seamless-branching disc in the corpus, but a different flavor than American Gangster (entry 21): both branches have identical duration (1h51m38s), same source VTS, same 35-segment map — the two titles are the same film played back with different default audio/subtitle selections (regular track vs sing-along). Confirms matrix256 handles seamless-branching authoring identically regardless of whether the branches differ in runtime or only in default stream picks.
+
+## 24. Heat (DVD-Video)
+
+- **matrix256:** `1983932253e4116af6606d4244256b1ce5d4ba0dc4cbb9686f22d8ae409ccab0`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** Second minimum-VTS commercial feature DVD — same single-VTS Warner Home Video authoring pattern as Casablanca (entry 22), different feature (2h50m vs 1h42m), more chapters (52 vs 36), slightly smaller `VTS_01_0.IFO` (110 KB vs 116 KB), distinct fingerprint. Gives the "minimum-VTS" axis two data points across very different eras (1942 catalog release vs 1995 theatrical). Notable curiosity: the UDF volume label `HEAT_16X9LB_DUAL_LAYER_NA` encodes the aspect ratio (16:9 letterbox), disc type (DVD9 dual layer), and region (North America) directly — one of the most descriptive volume labels in the corpus.
+
+## 25. Stonehenge Apocalypse (DVD-Video)
+
+- **matrix256:** `5e0e5f5de53fce798cd9093df32051865fe452c2459cd09f257312caad1b5004`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** Here's an obscure, D-Tier movie called Stonehenge Apocalypse. First single-layer (DVD5) commercial feature in the corpus — total VOB payload is ~4.5 GB across 4 VTSes, comfortably fitting DVD5 capacity, where every previous commercial feature in the corpus is DVD9. Also notable: MakeMKV reports the disc name as "Stonehenge Apocalypse" (proper capitalisation, with space) rather than the UDF volume label, confirming the VMG disc-title field *is* populated correctly when studios bother to set it — a clean counterpoint to American Gangster (entry 21) where that same field was left as "ASDF".
+
+## 26. Madso's War (DVD-Video)
+
+- **matrix256:** `cbf05563e0fbf73eba871d8f8cf94be685a7fdc59dadbc65a672679ba62fe8b9`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This movie is called Madso's War. Second DVD5 commercial feature in the corpus (alongside Stonehenge Apocalypse, entry 25) — ~4.1 GB of VOB payload fitting single-layer capacity, a 1h25m feature, and five shallow VTSes with the feature material in `VTS_03`. Unlike Stonehenge Apocalypse, this pressing left the VMG disc-title field unset, so MakeMKV falls back to the UDF volume label `MADSOS_WAR` — another data point for the "VMG disc-title is studio-discretionary" observation (contrast entries 21 and 25).
+
+## 27. VANish (DVD-Video)
+
+- **matrix256:** `e90c7a1341c8ef43b01188b28fa335bad846dbe131b3e58768e43b8afe621943`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This movie is VANish (2015).
+
+## 28. Treasure Guards (DVD-Video)
+
+- **matrix256:** `a75a01a298decf62788c7175cdea2e0aa91a3a9af02bd8da1fbee1ee2715a30c`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This movie is Treasure Guards (2011). Third DVD5 commercial feature in the corpus (alongside entries 25 and 26) — ~3.9 GB payload across just 2 VTSes, the minimum VTS count for any DVD5 entry here. Also notable for audio/subtitle language codes reported as `xx` (unset) by lsdvd, unusual compared to the properly-tagged `en/es/fr` of higher-budget pressings — consistent with lean authoring on low-budget releases.
+
+## 29. The Reading Room (DVD-Video)
+
+- **matrix256:** `111878a8ecdcc09b9dca5b1f889c76f986b703a3c24adf77c7d86c0dd68ad5b4`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This movie is The Reading Room (2005). Fourth DVD5 commercial feature in the corpus and a near-identical structural twin of Treasure Guards (entry 28): same 3-IFO / 2-VTS layout, `VTS_01_0.IFO` within 2 KB of its match (70 KB vs 72 KB), both `xx` audio/subtitle language codes, both with `Provider ID` set to the volume label — yet the two fingerprints differ completely. Sharpens the sibling-distinction observation at the low-budget template-authoring end of the DVD spectrum.
+
+## 30. The Secret (DVD-Video)
+
+- **matrix256:** `1dc7a2d76e69093e63801922272f03aad9b6f70c4c97644a0cc622938770f340`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This movie is The Secret (2006). Most VTSes of any DVD in the corpus — 12 VTSes and 13 IFOs hashed — yet still DVD5 (~4.2 GB total payload). Unusual authoring: the 1h30m feature lives in `VTS_05` (`VTS_05_0.IFO` 78 KB), while each short extra (from 30 seconds to 8 minutes) is isolated in its own dedicated VTS with an identical 18 KB IFO. Extends the high end of the DVD VTS-count axis (previous max was Four Brothers's 8 VTSes at entry 18).
+
+## 31. The Endless Summer (DVD-Video)
+
+- **matrix256:** `448a1cb79358460ac3304c065868d989f03ed85de907497daf3ed43162a42bf7`
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This movie is The Endless Summer (1966). Sixth DVD5 commercial feature in the corpus, and the first disc carrying a true **mono (1-channel) audio track** — a 1966 surf documentary preserving its original single-channel mix, where every previous corpus disc ships stereo (2ch) or 5.1 (6ch). Structurally aligned with the 3-IFO / 2-VTS template of entries 28-29 but with a larger `VTS_01_0.IFO` (80 KB, reflecting the feature's 20 chapters) and a properly-tagged `en` language code — a counter-example to the "xx" unset pattern seen on other low-budget pressings.
 
 ## Reproducing a fingerprint
 
