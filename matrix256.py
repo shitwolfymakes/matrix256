@@ -1,4 +1,10 @@
-"""matrix256 — reference implementation of the optical disc fingerprint.
+"""matrix256 v0 — reference implementation of the optical disc fingerprint.
+
+This is matrix256 version 0, the initial implementation of structural
+fingerprinting over disc-native metadata bytes. Digests produced by this code
+are matrix256 v0 digests. Future revisions of the specification will be
+defined as distinct algorithms (v1, v2, ...) and published alongside this one,
+producing independent digests rather than modifying v0 output.
 
 Factored for reuse. The selection and hashing logic here must stay in lockstep
 with the normative reference in README.md. If one changes, the other must too.
@@ -9,6 +15,8 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 from pathlib import Path
+
+VERSION = "0"
 
 
 @dataclass

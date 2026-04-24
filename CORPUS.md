@@ -1,12 +1,16 @@
 # Evaluation corpus
 
-Discs inspected with `inspect_disc.py` to exercise matrix256 against real-world inputs. Each entry records the computed fingerprint so any reproducer can verify their implementation against a known digest.
+Discs inspected with `inspect_disc.py` to exercise matrix256 against real-world inputs. Each entry records the computed **matrix256 v0** fingerprint so any reproducer can verify their implementation against a known digest.
 
 The corpus is not normative — matrix256's specification is the source of truth. These are illustrative fixtures covering open-content and commercial pressings, DVD and Blu-ray, HDMV-only and BD-J-heavy, protected and unprotected.
 
+All digests below are matrix256 v0 digests. Future revisions of the specification, if published, will be distinct algorithms (v1, v2, ...) producing independent digests; the v0 values recorded here remain stable regardless of future work.
+
+**Reference environment.** All fingerprints in this corpus were computed on Ubuntu 24.04.4 LTS (noble), using `inspect_disc.py` with the system's default UDF and ISO 9660 drivers and `udisksctl` for mount handling. The spec's reproducibility property guarantees the same digests on any correct implementation regardless of OS, but the corpus values themselves are empirical artifacts of this specific environment. Divergence between a new implementation's output and a corpus value is evidence of either a spec bug or an environmental issue, not a property of the disc.
+
 ## Summary
 
-| # | Title | Type | matrix256 (first 16) |
+| # | Title | Type | matrix256 v0 (first 16) |
 |---|---|---|---|
 | 1 | Big Buck Bunny | Blu-ray | `38d3330a06917cbc` |
 | 2 | Sintel | DVD-Video | `4bba5d860a2e61b7` |

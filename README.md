@@ -1,8 +1,12 @@
 # matrix256: Reproducible Fingerprints for Optical Discs
 
+**Version:** 0 (initial, pre-stable)
+
 **matrix256** is a reproducible SHA-256 fingerprint for optical discs (DVD-Video, Blu-ray) computed from disc-native bytes only. Given the same disc, any correct implementation of this specification produces the same digest, regardless of operating system, reader hardware, or language runtime. For audio CDs, matrix256 defers to the existing MusicBrainz Disc ID unchanged.
 
 The name is an homage to the *matrix number* — the identifier etched into the metal stamper that presses every disc — with the `256` suffix pinning the hash function.
+
+This document describes **matrix256 v0**: the initial specification, released for community review. The algorithm described here — structural hashing of named metadata files (IFO, index.bdmv, MPLS, CLPI) — is being evaluated against a real-disc corpus. Future revisions may change the input selection rule (for example, to a full filesystem-tree hash); any such revision will be published as a distinct algorithm version (v1, v2, ...) with its own digest, not as a modification of v0. Digests produced against this specification are stable regardless of future versions.
 
 ## Motivation
 
@@ -138,7 +142,7 @@ For audio CDs, use any conforming implementation of MusicBrainz Disc ID (`libdis
 
 **Why exclude backup files.** `VIDEO_TS.BUP`, `VTS_NN_0.BUP`, and `BDMV/BACKUP/*` are duplicates of the primary metadata files. Including them in the hash would double-count identical bytes and add nothing to the identifier's specificity.
 
-**Why exclude format versioning.** An earlier draft of this specification included a `format_version` field alongside the digest so that the algorithm could be updated later without invalidating existing hashes. That field was removed: if the hash ever depends on implementation choices, the reproducibility property is lost. The file list and ordering are fixed for this version of the specification. Future revisions, if needed, will be defined as separate algorithms (e.g., a hypothetical `DiscFingerprint/v2`) and published alongside this one, not as a modification of it.
+**Why exclude format versioning.** An earlier draft of this specification included a `format_version` field alongside the digest so that the algorithm could be updated later without invalidating existing hashes. That field was removed: if the hash ever depends on implementation choices, the reproducibility property is lost. The file list and ordering are fixed for this version (v0) of the specification. Future revisions, if needed, will be defined as separate algorithms (e.g., a hypothetical `matrix256/1`) and published alongside this one, not as a modification of it. Implementations that need to disambiguate between specification versions should do so at the application or protocol layer (database column, API response field), not within the digest string itself.
 
 **Why many fingerprints per title is expected.** A theatrical release, a region A Blu-ray, a region B Blu-ray, a director's cut, and a special edition of the same film will typically each produce a distinct fingerprint. This is the intended behavior: the fingerprint identifies a specific disc edition, not an abstract title. The mapping from fingerprint to title is a separate, mutable, community-curated layer.
 
@@ -177,7 +181,7 @@ Files included in fingerprint (6 files, 1.2 MB):
     3. BDMV/PLAYLIST/00000.mpls   1.4 KB
     ...
 
-Fingerprint (SHA-256): 647f526d79439f2cc13b0516ebed57a18dc0a6ceb8d985db99b7a52748375cd4
+Fingerprint (matrix256 v0, SHA-256): 647f526d79439f2cc13b0516ebed57a18dc0a6ceb8d985db99b7a52748375cd4
 ```
 
 Flags: `--no-fingerprint` to skip hashing (selection only), `--json` for machine-readable output. Audio CDs are out of scope for this tool; use a MusicBrainz Disc ID implementation (`libdiscid`, `python-discid`, or equivalent).
