@@ -1,6 +1,6 @@
 # matrix256 Specification
 
-**Version:** 1.0
+**Version:** 1
 **Status:** Draft
 
 matrix256 is a reproducible cryptographic fingerprint for optical discs. Given the same disc, any correct implementation of this specification produces a bit-identical SHA-256 digest regardless of operating system, reader, optical drive, or language runtime.
@@ -28,7 +28,6 @@ matrix256 does not apply to:
 
 - **Audio CDs** (Red Book CDDA). Audio CDs carry no filesystem. The MusicBrainz Disc ID specification (https://musicbrainz.org/doc/Disc_ID_Calculation) is the established community identifier for audio CDs and is recommended as a complementary identifier alongside matrix256 in catalogs that handle both.
 - **LaserDisc** and other analog optical media. These formats have no filesystem and cannot be fingerprinted by this specification.
-- **Non-optical storage.** matrix256 is defined for optical discs only.
 
 ### 1.3 Relationship to other identifiers
 
@@ -138,37 +137,12 @@ Third-party implementations are encouraged to publish their own test vectors and
 
 This specification is **matrix256 version 1**. The version number identifies this specification; it is not embedded in the digest.
 
-Future specification versions, if defined, will be given distinct names (e.g., `matrix256/3`) and will produce distinct digests. This specification's digests remain stable regardless of future versions.
+Future specification versions, if defined, will be given distinct names (e.g., `matrix256v2`) and will produce distinct digests. This specification's digests remain stable regardless of future versions.
 
 Implementations that must disambiguate between specification versions should do so at the application or protocol layer (database column, API response field, URI path), not within the digest string itself.
 
 ## 6. Reference implementation
 
-A Python reference implementation is distributed alongside this specification. It depends only on the Python standard library and on a user-selected UDF/ISO 9660 reader.
+A Python reference implementation is distributed alongside this specification. It depends only on the Python standard library and operates on any filesystem path the host OS can present.
 
 The reference implementation is authoritative for conformance testing: an implementation is conformant if and only if it produces identical digests to the reference for every disc in the conformance corpus.
-
-## 7. Test vector
-
-For a hypothetical disc whose filesystem contains exactly two files:
-
-```
-BDMV/index.bdmv                92 bytes
-BDMV/MovieObject.bdmv         256 bytes
-```
-
-The serialized input to SHA-256 is (hex):
-
-```
-42 44 4D 56 2F 69 6E 64 65 78 2E 62 64 6D 76     "BDMV/index.bdmv"
-00                                                NUL
-39 32                                             "92"
-0A                                                LF
-42 44 4D 56 2F 4D 6F 76 69 65 4F 62 6A 65 63     "BDMV/MovieObjec
-74 2E 62 64 6D 76                                 t.bdmv"
-00                                                NUL
-32 35 36                                          "256"
-0A                                                LF
-```
-
-Total: 48 bytes. Conforming implementations are expected to verify the SHA-256 of this input as part of their test suite.
