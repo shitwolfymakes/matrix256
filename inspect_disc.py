@@ -32,7 +32,7 @@ from pathlib import Path
 from xml.dom import minidom
 from xml.parsers.expat import ExpatError
 
-from matrix256 import (
+from matrix256.v0 import (
     SelectionEntry,
     detect_disc_type,
     hash_files,

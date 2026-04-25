@@ -165,7 +165,7 @@ For audio CDs, use any conforming implementation of MusicBrainz Disc ID (`libdis
 
 Alongside the specification, this repository carries two small Python files that depend only on the standard library:
 
-- `matrix256.py` — the reference implementation above, factored into a reusable module. The file-selection and hashing logic is byte-for-byte equivalent to the code block in [Reference implementation](#reference-implementation-python); either can be used to verify a third-party implementation.
+- `matrix256/v0.py` — the reference implementation above, factored into a reusable submodule of the `matrix256` package. The file-selection and hashing logic is byte-for-byte equivalent to the code block in [Reference implementation](#reference-implementation-python); either can be used to verify a third-party implementation. Importing code addresses it as `from matrix256.v0 import ...`.
 - `inspect_disc.py` — a command-line tool that reports, for a mounted disc, which files would be fed into the fingerprint (in spec order, with sizes), which files are present but excluded (with the reason), and the resulting matrix256 digest. Intended for sanity-checking implementations and for surveying real discs.
 
 Example:
