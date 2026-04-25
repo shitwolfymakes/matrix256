@@ -61,7 +61,7 @@ A fingerprint that produces different digests for the same disc on different sys
 
 This means:
 
-- **No timestamps.** UDF timestamp handling varies across readers. The win7/win10 split in pydvdid is exactly this failure mode. matrix256 reads no timestamps.
+- **No timestamps.** Filesystem timestamp handling varies across readers and operating systems. The win7/win10 split in pydvdid is exactly this failure mode. matrix256 reads no timestamps.
 - **No filesystem-layer metadata that varies by reader.** Permissions, ownership, link counts, extended attributes — none of these are included, because optical media readers synthesize them inconsistently.
 - **No locale-aware operations.** Sort order is byte-wise lexicographic. String comparison is byte equality.
 - **No implementation-dependent byte selection.** matrix256 does not read specific offsets within files, does not interpret file contents, and does not parse any on-disc structure beyond what the filesystem reader already does.
@@ -70,7 +70,7 @@ This means:
 
 The fingerprint is a function of bytes on the disc. It does not depend on the reader software, the host operating system, the optical drive, the mount options, or the implementing programming language.
 
-Different readers may retrieve different bytes for file *contents* — but file contents are not part of matrix256's input. The filesystem *metadata* (filenames, sizes, tree structure) is stable across readers because it is stored as small, well-defined integer fields in specified positions of the filesystem's descriptors.
+Different readers may retrieve different bytes for file *contents* — but file contents are not part of matrix256's input. Filesystem *metadata* (filenames, sizes, tree structure) is stable across readers because it is stored as small, well-defined fields in specified positions of the filesystem's on-disc descriptors, and every conformant filesystem reader returns the same values from those fields.
 
 ### 3.3 Structural identity, not content identity
 
@@ -138,7 +138,7 @@ Tree-based hashing doesn't care. The `.BUP` file is just another entry in the fi
 
 ### 4.5 Reader-independence
 
-Filesystem sizes are stored as single integers in well-defined fields of the UDF File Entry or ISO 9660 directory record. Every filesystem reader returns the same integer for the same entry.
+Filesystem sizes are stored as single integers in well-defined fields of the filesystem's directory or file-entry descriptors. Every conformant filesystem reader returns the same integer for the same entry.
 
 File contents, by contrast, can differ subtly between readers: sector padding at file boundaries, short reads on damaged regions, extended-attribute handling. Metadata-content hashing is more exposed to reader-level variation than tree-based hashing.
 
@@ -146,7 +146,7 @@ File contents, by contrast, can differ subtly between readers: sector padding at
 
 Commercial Blu-rays encrypt their STREAM directory contents under AACS, requiring libaacs and valid AACS keys to read. Metadata-content hashing for Blu-ray read playlist and clip-info files, which are not AACS-encrypted — so the v1 approach worked without AACS keys.
 
-But tree-based hashing is cleaner still: it reads file *sizes* from the filesystem, without reading any file contents at all. The STREAM directory's M2TS files have readable sizes in the UDF filesystem regardless of AACS state. matrix256 therefore works on AACS-protected Blu-rays without any involvement of AACS licensing or key material, on DVD discs regardless of CSS protection, and on any future optical format using conventional filesystem-level content protection.
+But tree-based hashing is cleaner still: it reads file *sizes* from the filesystem, without reading any file contents at all. The STREAM directory's M2TS files have readable sizes in the filesystem metadata regardless of AACS state. matrix256 therefore works on AACS-protected Blu-rays without any involvement of AACS licensing or key material, on DVD discs regardless of CSS protection, and on any future optical format using conventional filesystem-level content protection.
 
 ## 5. Non-goals and trade-offs
 
@@ -190,7 +190,7 @@ Across this corpus, matrix256 exhibits:
 - **Cross-medium differentiation.** Same-title DVD and Blu-ray pressings produce distinct digests, as expected given their entirely different file trees.
 - **Cross-edition differentiation.** Theatrical and extended cuts of the same film produce distinct digests.
 
-The corpus also surfaced incidental findings about optical disc authoring practices — cross-studio authoring templates (the "2 HDMV + 79 BD-J" pattern shared across Paramount, Universal, and Focus Features releases; the "5 HDMV + 86 BD-J" pattern shared across Fox, Paramount, and Lionsgate releases), display-name conventions (trademark glyph suffixes like "Blu-ray™" across Sony, Summit, and Paramount releases), and non-ASCII character handling in UDF volume labels — which are documented in the corpus notes and inform future specification refinements.
+The corpus also surfaced incidental findings about optical disc authoring practices — cross-studio authoring templates (the "2 HDMV + 79 BD-J" pattern shared across Paramount, Universal, and Focus Features releases; the "5 HDMV + 86 BD-J" pattern shared across Fox, Paramount, and Lionsgate releases), display-name conventions (trademark glyph suffixes like "Blu-ray™" across Sony, Summit, and Paramount releases), and non-ASCII character handling in volume labels — which are documented in the corpus notes and inform future specification refinements.
 
 ## 7. Future work
 

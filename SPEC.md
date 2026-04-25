@@ -13,12 +13,14 @@ The name is an homage to the *matrix number* — the identifier etched into the 
 
 matrix256 applies to any optical disc that exposes a readable filesystem, including:
 
-- DVD-Video and DVD-ROM (UDF, ISO 9660, or UDF/ISO bridge)
-- HD DVD (UDF 2.50)
-- Blu-ray and UHD Blu-ray (UDF 2.50)
-- Video CD and Super Video CD (ISO 9660)
+- DVD-Video and DVD-ROM
+- HD DVD
+- Blu-ray and UHD Blu-ray
+- Video CD and Super Video CD
 - Data discs on any of the above media
 - Combo-pack supplementary discs (digital copy DVDs, bonus data discs)
+
+More broadly, matrix256 applies to any rooted filesystem tree. The optical-disc framing reflects the primary intended use case, but nothing in the algorithm is specific to optical media or to any particular filesystem.
 
 ### 1.2 Out of scope
 
@@ -39,45 +41,39 @@ matrix256 does not replace or subsume:
 
 These identifiers serve different purposes and may be recorded alongside matrix256 in any catalog.
 
+### 1.4 Input precondition
+
+matrix256 operates on a filesystem rooted at a path provided by the caller. The specification assumes the provided root is a successfully mounted, readable filesystem in which all file entries can be enumerated and have retrievable paths and sizes. Mounting, filesystem-view selection on multi-filesystem media (e.g., UDF/ISO 9660 bridge discs), and error handling for mount failures are outside the scope of this specification. Two implementations that walk different filesystem views of the same physical media will produce different (and individually correct) digests; reconciling such variation is the responsibility of the lookup or catalog layer that consumes matrix256 digests, not the algorithm itself.
+
 ## 2. Algorithm
 
 The matrix256 digest of an optical disc is the SHA-256 hash of a canonically serialized listing of the disc's filesystem entries. The output is encoded as 64 lowercase hexadecimal characters.
 
 ### 2.1 Enumerate filesystem entries
 
-Walk the disc's filesystem starting at the mount root. Collect every **regular file** entry. Exclude:
+Starting at the provided root, walk the filesystem and collect every **regular file** entry. Exclude:
 
-- Directories (directory entries are not emitted; their presence is implicit in the paths of contained files).
-- Symbolic links (not followed, not emitted as entries).
+- Directories (their presence is implicit in the paths of contained files).
+- Symbolic links (not followed, not emitted).
 - Other non-file entries (devices, sockets, FIFOs).
 
 Include all regular file entries regardless of filesystem flags (hidden, system, archive).
 
-**Bridge discs.** On discs that expose both UDF and ISO 9660 views of the same underlying data, use the UDF view. On ISO 9660 discs with Joliet or Rock Ridge extensions, use the extended view that surfaces full-length filenames.
-
 ### 2.2 Normalize paths
 
-For each file entry, compute its path relative to the mount root.
-
-Each relative path:
+For each file entry, compute its path relative to the provided root. Each relative path:
 
 1. Uses the forward slash `/` (U+002F) as the directory separator.
 2. Contains no leading slash.
-3. Preserves the case as stored in the filesystem.
-4. Is decoded from the filesystem's native encoding to Unicode per the applicable filesystem specification (ECMA-167 / OSTA UDF for UDF filesystems; ISO 9660 with Joliet or Rock Ridge extensions as applicable).
-5. Is normalized to Unicode Normalization Form C (NFC).
-6. Is encoded as UTF-8 for serialization.
+3. Preserves the case as presented by the filesystem.
+4. Is normalized to Unicode Normalization Form C (NFC).
+5. Is encoded as UTF-8 for serialization.
 
-Filesystem-native filenames that cannot be decoded as valid Unicode are encoded as UTF-8 with the Unicode replacement character (U+FFFD, bytes `EF BF BD`) substituted for each invalid code unit.
+Paths that cannot be represented as valid Unicode are encoded as UTF-8 with the Unicode replacement character (U+FFFD, bytes `EF BF BD`) substituted for each invalid code unit.
 
 ### 2.3 Determine file size
 
-For each file entry, use the size as stored in the filesystem metadata:
-
-- UDF: the Information Length field of the File Entry or Extended File Entry descriptor.
-- ISO 9660: the Data Length field of the directory record.
-
-Implementations **must not** verify the size by reading or seeking through file contents. The declared size is authoritative.
+For each file entry, use the size as reported by the filesystem. Implementations **must not** verify the size by reading or seeking through file contents; the reported size is authoritative.
 
 ### 2.4 Sort
 
@@ -120,7 +116,6 @@ This is a valid digest. Implementations must not special-case empty filesystems 
 
 Implementations must fail explicitly and must not produce a digest under any of the following conditions:
 
-- The disc's filesystem cannot be mounted or enumerated.
 - A directory's contents cannot be read.
 - A file entry's size or path cannot be retrieved from filesystem metadata.
 
@@ -141,7 +136,7 @@ Third-party implementations are encouraged to publish their own test vectors and
 
 ## 5. Versioning
 
-This specification is **matrix256 version 2**. The version number identifies this specification; it is not embedded in the digest.
+This specification is **matrix256 version 1**. The version number identifies this specification; it is not embedded in the digest.
 
 Future specification versions, if defined, will be given distinct names (e.g., `matrix256/3`) and will produce distinct digests. This specification's digests remain stable regardless of future versions.
 
