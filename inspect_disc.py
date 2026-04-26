@@ -1,4 +1,4 @@
-"""Inspect an optical disc and show what the fingerprint covers.
+"""Inspect an optical disc and show what the matrix256 fingerprints cover.
 
 Usage:
     python inspect_disc.py <path> [--no-fingerprint] [--no-metadata] [--json]
@@ -8,12 +8,14 @@ file, or a block device (e.g. /dev/sr0). ISO images are loop-mounted read-only
 via udisksctl; block devices are mounted via udisksctl if not already mounted
 by the desktop. Either way, anything the script mounted is unmounted on exit.
 
-Shows disc type, files included in the fingerprint (in spec order, with sizes),
-files present but excluded by the spec (with the reason), and a MakeMKV-style
-metadata summary (titles, durations, chapters, streams). Metadata extraction
-uses lsdvd for DVDs and libbluray's bd_info/bd_list_titles for Blu-rays;
-install `lsdvd` and `libbluray-bin` to enable. Useful for verifying spec
-compliance on real discs and for building an evaluation corpus.
+Computes both matrix256v0 (structural hash over a fixed list of disc-native
+metadata files) and matrix256v1 (filesystem-walk hash over (path, size)
+records). Shows disc type, the v0 input set in spec order, files present but
+excluded from the v0 set (with the reason), and a MakeMKV-style metadata
+summary (titles, durations, chapters, streams). Metadata extraction uses
+lsdvd for DVDs and libbluray's bd_info/bd_list_titles for Blu-rays; install
+`lsdvd` and `libbluray-bin` to enable. Useful for verifying spec compliance
+on real discs and for building an evaluation corpus.
 """
 
 from __future__ import annotations
@@ -23,6 +25,7 @@ import ast
 import contextlib
 import csv
 import json
+import platform
 import re
 import shutil
 import subprocess
@@ -32,6 +35,7 @@ from pathlib import Path
 from xml.dom import minidom
 from xml.parsers.expat import ExpatError
 
+from matrix256 import v1
 from matrix256.v0 import (
     SelectionEntry,
     detect_disc_type,
@@ -491,6 +495,75 @@ def _read_disc_library_xml(disc_type: str, mount: Path) -> dict | None:
     return {"path": rel, "found": True, "content": content}
 
 
+def _detect_source_kind(path: Path) -> str:
+    """Classify the original `path` argument per IMPLEMENTERS.md §5: physical
+    disc (block device), ISO image (regular file), or filesystem (already-
+    mounted directory whose underlying source we can't infer). Surfacing this
+    matters for lookup-service submissions, where a single physical pressing
+    can produce different digests through different filesystem views."""
+    if path.is_block_device():
+        return "physical_disc"
+    if path.is_file():
+        return "iso_image"
+    if path.is_dir():
+        return "filesystem"
+    return "unknown"
+
+
+def _detect_filesystem_view(mount: Path) -> dict:
+    """Query findmnt for the filesystem driver and mount options at `mount`.
+
+    `findmnt -T <path>` walks up to the closest enclosing mountpoint, so this
+    works whether `mount` is itself the mount target or a subdirectory.
+    Returns an empty dict if findmnt is missing or doesn't report a mount.
+    """
+    if shutil.which("findmnt") is None:
+        return {}
+    out = subprocess.run(
+        ["findmnt", "-J", "-T", str(mount), "-o", "FSTYPE,OPTIONS,SOURCE"],
+        capture_output=True, text=True, check=False,
+    )
+    if out.returncode != 0 or not out.stdout.strip():
+        return {}
+    try:
+        data = json.loads(out.stdout)
+    except json.JSONDecodeError:
+        return {}
+    fs_list = data.get("filesystems") or []
+    if not fs_list:
+        return {}
+    fs = fs_list[0]
+    view: dict = {}
+    if fs.get("fstype"):
+        view["filesystem"] = fs["fstype"]
+    if fs.get("options"):
+        view["mount_options"] = fs["options"]
+    if fs.get("source"):
+        view["mount_device"] = fs["source"]
+    return view
+
+
+def _reader_info() -> dict:
+    """Capture the OS and Python version used to enumerate the filesystem.
+
+    Per IMPLEMENTERS.md §5 these are optional audit fields, useful when a
+    digest needs to be reconciled against another implementation that picked
+    a different default view (e.g. ISO 9660 vs UDF on a bridge disc).
+    """
+    return {
+        "tool": "inspect_disc.py",
+        "python": platform.python_version(),
+        "os": f"{platform.system()} {platform.release()}".strip(),
+    }
+
+
+def _build_submission_view(source: Path, mount: Path) -> dict:
+    view = {"source_kind": _detect_source_kind(source)}
+    view.update(_detect_filesystem_view(mount))
+    view["reader"] = _reader_info()
+    return view
+
+
 def _fmt_size(n: int) -> str:
     if n < 1024:
         return f"{n} B"
@@ -689,17 +762,44 @@ def render_disc_library_xml(dlx: dict | None) -> list[str]:
     return [header, _pretty_xml(dlx["content"])]
 
 
+def render_submission(view: dict) -> list[str]:
+    """Render IMPLEMENTERS.md §5 submission fields for the digest's filesystem
+    view. Surfaced in every report so users can record it now and forward it
+    to a lookup service later."""
+    if not view:
+        return []
+    lines = ["Submission metadata (filesystem view):"]
+    lines.append(f"  Source kind:    {view.get('source_kind', 'unknown')}")
+    if view.get("filesystem"):
+        lines.append(f"  Filesystem:     {view['filesystem']}")
+    if view.get("mount_device"):
+        lines.append(f"  Mount device:   {view['mount_device']}")
+    if view.get("mount_options"):
+        lines.append(f"  Mount options:  {view['mount_options']}")
+    reader = view.get("reader") or {}
+    if reader:
+        bits = [b for b in (
+            reader.get("tool"),
+            f"python {reader['python']}" if reader.get("python") else None,
+            reader.get("os"),
+        ) if b]
+        if bits:
+            lines.append(f"  Reader:         {' · '.join(bits)}")
+    return lines
+
+
 def render_text(
     source: Path,
     mount: Path,
     disc_type: str,
     included: list[SelectionEntry],
     excluded: list[tuple[str, int, str]],
-    fingerprint: str | None,
+    fingerprints: dict[str, str | None],
     metadata: dict | None = None,
     show_metadata: bool = True,
     disc_library_xml: dict | None = None,
     metadata_makemkv: dict | None = None,
+    submission: dict | None = None,
 ) -> str:
     lines: list[str] = []
     lines.append(f"Source:    {source}")
@@ -708,32 +808,41 @@ def render_text(
     lines.append(f"Disc type: {disc_type}")
     lines.append("")
 
-    if not included:
-        lines.append("No fingerprint input files found.")
+    if included:
+        total = sum(e.path.stat().st_size for e in included)
+        lines.append(f"Files included in matrix256v0 fingerprint ({len(included)} files, {_fmt_size(total)}):")
+        width = max(len(e.relative) for e in included)
+        for i, e in enumerate(included, 1):
+            size = e.path.stat().st_size
+            lines.append(f"  {i:>3}. {e.relative:<{width}}  {_fmt_size(size):>10}")
+        lines.append("")
+    else:
+        lines.append("No matrix256v0 input files found.")
         if disc_type == "unknown":
             lines.append("This path does not contain a VIDEO_TS or BDMV directory.")
             lines.append("Audio CDs are not inspectable from a filesystem path; use a MusicBrainz Disc ID tool (libdiscid / python-discid).")
-        return "\n".join(lines)
-
-    total = sum(e.path.stat().st_size for e in included)
-    lines.append(f"Files included in fingerprint ({len(included)} files, {_fmt_size(total)}):")
-    width = max(len(e.relative) for e in included)
-    for i, e in enumerate(included, 1):
-        size = e.path.stat().st_size
-        lines.append(f"  {i:>3}. {e.relative:<{width}}  {_fmt_size(size):>10}")
-    lines.append("")
+        lines.append("")
 
     if excluded:
-        lines.append(f"Files present but excluded by spec ({len(excluded)}):")
+        lines.append(f"Files present but excluded from matrix256v0 ({len(excluded)}):")
         ex_width = max(len(name) for name, _, _ in excluded)
         for name, size, reason in excluded:
             lines.append(f"       {name:<{ex_width}}  {_fmt_size(size):>10}  ({reason})")
         lines.append("")
 
-    if fingerprint is not None:
-        lines.append(f"Fingerprint (SHA-256): {fingerprint}")
+    fp_v0 = fingerprints.get("v0")
+    fp_v1 = fingerprints.get("v1")
+    if fp_v0 is None and fp_v1 is None:
+        lines.append("Fingerprints: not computed (--no-fingerprint)")
     else:
-        lines.append("Fingerprint: not computed (--no-fingerprint)")
+        lines.append("Fingerprints (SHA-256):")
+        lines.append(f"  matrix256v0: {fp_v0 if fp_v0 is not None else 'n/a (no input files)'}")
+        lines.append(f"  matrix256v1: {fp_v1 if fp_v1 is not None else 'n/a'}")
+
+    sub_lines = render_submission(submission or {})
+    if sub_lines:
+        lines.append("")
+        lines.extend(sub_lines)
 
     if show_metadata:
         md_lines = render_metadata(metadata, disc_type)
@@ -763,10 +872,12 @@ def build_report(source: Path, mount: Path, compute: bool, include_metadata: boo
         included = []
         excluded = []
 
-    fingerprint = hash_files(included) if compute and included else None
+    fingerprint_v0 = hash_files(included) if compute and included else None
+    fingerprint_v1 = v1.fingerprint(mount) if compute else None
     metadata = _extract_metadata(disc_type, mount) if include_metadata else None
     disc_library_xml = _read_disc_library_xml(disc_type, mount) if include_metadata else None
     metadata_makemkv = _extract_makemkv_metadata(source, mount) if include_metadata else None
+    submission = _build_submission_view(source, mount)
 
     return {
         "source": str(source),
@@ -779,7 +890,11 @@ def build_report(source: Path, mount: Path, compute: bool, include_metadata: boo
             {"path": name, "size": size, "reason": reason}
             for name, size, reason in excluded
         ],
-        "fingerprint": fingerprint,
+        "fingerprints": {
+            "v0": fingerprint_v0,
+            "v1": fingerprint_v1,
+        },
+        "submission": submission,
         "metadata": metadata,
         "metadata_makemkv": metadata_makemkv,
         "disc_library_xml": disc_library_xml,
@@ -798,15 +913,16 @@ def _inspect(source: Path, mount: Path, *, compute: bool, metadata: bool, as_jso
     excluded = [(e["path"], e["size"], e["reason"]) for e in report["excluded"]]
     print(render_text(
         source, mount, report["disc_type"], included, excluded,
-        report["fingerprint"], report.get("metadata"),
+        report["fingerprints"], report.get("metadata"),
         show_metadata=metadata,
         disc_library_xml=report.get("disc_library_xml"),
         metadata_makemkv=report.get("metadata_makemkv"),
+        submission=report.get("submission"),
     ))
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Inspect what the disc fingerprint covers on a mounted optical disc or ISO image.")
+    parser = argparse.ArgumentParser(description="Inspect what the matrix256v0 and matrix256v1 fingerprints cover on a mounted optical disc or ISO image.")
     parser.add_argument("path", type=Path, help="Mounted disc directory (e.g. /media/user/DISC), ISO file (.iso), or block device (e.g. /dev/sr0)")
     parser.add_argument("--no-fingerprint", action="store_true", help="Skip SHA-256 computation (selection only)")
     parser.add_argument("--no-metadata", action="store_true", help="Skip title/stream metadata extraction (lsdvd / bd_info)")
