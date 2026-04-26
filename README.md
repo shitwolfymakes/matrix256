@@ -6,7 +6,7 @@
 
 The name is an homage to the *matrix number* — the identifier etched into the metal stamper that presses every disc — with the `256` suffix pinning the hash function.
 
-This document describes **matrix256 v0**: the initial specification, released for community review. The algorithm described here — structural hashing of named metadata files (IFO, index.bdmv, MPLS, CLPI) — is being evaluated against a real-disc corpus. Future revisions may change the input selection rule (for example, to a full filesystem-tree hash); any such revision will be published as a distinct algorithm version (v1, v2, ...) with its own digest, not as a modification of v0. Digests produced against this specification are stable regardless of future versions.
+This document describes **matrix256v0**: the initial specification, released for community review. The algorithm described here — structural hashing of named metadata files (IFO, index.bdmv, MPLS, CLPI) — is being evaluated against a real-disc corpus. Future revisions may change the input selection rule (for example, to a full filesystem-tree hash); any such revision will be published as a distinct algorithm version (v1, v2, ...) with its own digest, not as a modification of v0. Digests produced against this specification are stable regardless of future versions.
 
 ## Motivation
 
@@ -181,7 +181,7 @@ Files included in fingerprint (6 files, 1.2 MB):
     3. BDMV/PLAYLIST/00000.mpls   1.4 KB
     ...
 
-Fingerprint (matrix256 v0, SHA-256): 647f526d79439f2cc13b0516ebed57a18dc0a6ceb8d985db99b7a52748375cd4
+Fingerprint (matrix256v0, SHA-256): 647f526d79439f2cc13b0516ebed57a18dc0a6ceb8d985db99b7a52748375cd4
 ```
 
 Flags: `--no-fingerprint` to skip hashing (selection only), `--json` for machine-readable output. Audio CDs are out of scope for this tool; use a MusicBrainz Disc ID implementation (`libdiscid`, `python-discid`, or equivalent).

@@ -37,8 +37,8 @@ When editing the spec or the reference implementation, these properties must hol
 
 ## Version labeling conventions
 
-- In running text: "matrix256 v0", "matrix256 v1" (or just "matrix256" where the context makes the version unambiguous, e.g. inside `README.md` or `CORPUS.md` after the introduction has established scope).
-- In structured contexts (database columns, API fields, file headers): `matrix256v0`, `matrix256v1`, or a separate `version: 0` / `version: 1` field.
+- The version-bearing label is always `matrix256v0` / `matrix256v1` — no space between the family name and the version, in running prose and in structured contexts alike (database columns, API fields, file headers, table headers, bold field names). Bare `matrix256` is fine where the version is unambiguous from context (e.g. inside `README.md` or `CORPUS.md` after the introduction has established scope).
+- A separate `version: 0` / `version: 1` field is acceptable as an alternative when the carrier already names matrix256 elsewhere.
 - In the v0 reference implementation: `matrix256.v0.VERSION = "0"`.
 - Never embed the version in the digest string itself — the digest is a 64-character lowercase hex SHA-256, nothing else.
 
