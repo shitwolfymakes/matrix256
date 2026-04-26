@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Two algorithm versions coexist in this repo:
 
 - **v0 (initial, frozen):** structural hash over a fixed list of named metadata files. DVD: `VIDEO_TS.IFO`, `VTS_NN_0.IFO`. Blu-ray: `index.bdmv`, `MovieObject.bdmv`, MPLS, CLPI. The normative spec is `README.md` and the reference implementation is `matrix256/v0.py`. v0 is under active evaluation against the real-disc corpus in `CORPUS.md`; published v0 digests must remain stable.
-- **v1 (draft, filesystem-agnostic):** walk the entire filesystem at the provided root and serialize `(path, size)` records. The normative spec is `SPEC.md`. There is no v1 reference implementation yet — `matrix256/v1.py` is the planned home.
+- **v1 (draft, filesystem-agnostic):** walk the entire filesystem at the provided root and serialize `(path, size)` records. The normative spec is `SPEC.md`; the reference implementation is `matrix256/v1.py`. v1 has no published corpus digests yet, so the immutability rule does not bind until corpus entries land.
 
 Companion (non-normative) documents:
 
@@ -20,7 +20,7 @@ Companion (non-normative) documents:
 
 The name doubles as the identifier's name, the library module, the CLI entry point, and the planned PyPI/npm/crates/brew slot (all verified free as of 2026-04-18). It's a reference to the *matrix number* etched into the metal disc-pressing stamper, with `256` pinning SHA-256.
 
-There is no build system or test suite. Alongside the specs, the repo carries a stdlib-only Python package (`matrix256/`, with each algorithm version as a submodule — currently only `matrix256.v0`) and a CLI (`inspect_disc.py`) that shows which files a v0 fingerprint of a mounted disc would consume. A venv lives at `.venv/`; no external dependencies are required.
+There is no build system or test suite. Alongside the specs, the repo carries a stdlib-only Python package (`matrix256/`, with each algorithm version as a submodule: `matrix256.v0`, `matrix256.v1`) and a CLI (`inspect_disc.py`) that shows which files a v0 fingerprint of a mounted disc would consume. A venv lives at `.venv/`; no external dependencies are required.
 
 The `matrix256.v0` submodule and the README v0 reference implementation are two expressions of the same normative v0 algorithm — if either changes, both must move together and produce byte-identical digests on the same input.
 
@@ -46,7 +46,7 @@ When editing the spec or the reference implementation, these properties must hol
 
 - The v0 normative spec is `README.md`; the v1 normative spec is `SPEC.md`. Keep them clearly separated: don't blur v0 prose with v1 framing or vice versa.
 - v0 has two synchronized expressions: the prose+code in `README.md` and the submodule `matrix256/v0.py`. If file-selection or ordering logic changes in one, update the other and verify they still produce byte-identical digests on the corpus.
-- v1 has no reference implementation yet. The planned home is `matrix256/v1.py`; if you add one, treat it the same way as v0 (prose in `SPEC.md` and code must match), and any future v1 corpus digests are immutable from the moment they're published.
+- v1 has the same prose+code synchronization rule: `SPEC.md` and `matrix256/v1.py` must agree. Any v1 digests, once recorded against a corpus, are immutable from that moment on.
 - When revising v0 prose, keep the DVD/Blu-ray/audio-CD sections symmetric (collect → sort → concatenate → SHA-256) — the paper's readability depends on that parallelism. v1 is filesystem-agnostic, so the parallelism rule does not apply there.
 - Filenames in DVD-Video are uppercase; UDF is case-insensitive but case-sensitive views must select uppercase. Don't "fix" this to be case-insensitive in v0 reference code.
 - Argumentative content belongs in `RATIONALE.md`; practical implementer concerns (mounting, encoding, bridge-disc resolution) belong in `IMPLEMENTERS.md`. Both are non-normative and must not contradict the specs they accompany.
