@@ -73,11 +73,22 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 | 59 | Heat DDE — Bonus Features | Blu-ray | `da8189bd93e98ebe` |
 | 60 | Venom (2018) | Blu-ray | `30155044cfc76130` |
 | 61 | Venom: Let There Be Carnage | Blu-ray | `18511045d4815122` |
+| 62 | Andromeda S1 — Disc 5 | DVD-Video | `20386c7ea6725540` |
+| 63 | Andromeda S2 — Disc 1 | DVD-Video | `c1b87ae72253de1e` |
+| 64 | Andromeda S2 — Disc 4 | DVD-Video | `0089e5850b060e01` |
+| 65 | Andromeda S2 — Disc 5 | DVD-Video | `b9f4fba54b7f0c9c` |
+| 66 | Andromeda S5 — Disc 3 | DVD-Video | `7f72e16030ac6cd4` |
+| 67 | Andromeda S5 — Disc 4 | DVD-Video | `2c7987a5776e2fc3` |
+| 68 | Andromeda S3 — Disc 3 | DVD-Video | `f8b910aa68dfda89` |
+| 69 | Andromeda S4 — Disc 2 | DVD-Video | `471776d99f6997a6` |
 
 ## 1. Big Buck Bunny (Blu-ray)
 
 - **Source:** Blender Foundation, open content (https://peach.blender.org/)
 - **matrix256v0:** `38d3330a06917cbc1b66ec2d4c36942809071d3ee8b5c920bcc1c399a11ae3a4`
+- **matrix256v1:** `652e8189d14d260ea73e0e8e08848a455139e110b0655c56dd0cf42886f1499d`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `69C41314710953D5C34CBF0E01F20BC870CF704A`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 599 HDMV + 4 BD-J (4 "unsupported")
@@ -88,12 +99,18 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 
 - **Source:** Blender Foundation, open content (https://durian.blender.org/)
 - **matrix256v0:** `4bba5d860a2e61b7b93778a97c65da01347416645f6eb971a27c17000d20880d`
+- **matrix256v1:** `ee3ac7007f0854a3ea43cc0ecd5a9991df129aad7a6ee6e74f1d2fa5e984940d`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** The DVD counterpart to Big Buck Bunny. Exercises the DVD path of the algorithm (VIDEO_TS.IFO + VTS_NN_0.IFO selection). Open content, so the ISO can be redistributed as a test fixture.
 
 ## 3. The Martian (Blu-ray)
 
 - **matrix256v0:** `0c4c94044c3309c077beeb7a092b8dc405de7195512cf89aaf89a9a22f96bb89`
+- **matrix256v1:** `202d14c8a8f22a16dd52ba6dfd42b766cfb89eb9a769e413572def041873fb0d`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `C803CB1A9B5484B1B970378ED7E1D531DDB3276C`
 - **Protection:** AACS ✓, BD+ ✓, BD-J ✓
 - **Titles:** 5 HDMV + 86 BD-J (86 "unsupported"); main title #70
@@ -104,6 +121,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 4. The Boondock Saints (Blu-ray)
 
 - **matrix256v0:** `fe37e0802e514cfd76543fce0aaed51d2d655787b4b0235e1258ecea5a2dc287`
+- **matrix256v1:** `16aed31722591f8cd4aec0a0282c135a49ac365a2434bf490ecfcff767d4200f`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `AF3FA2FD3D2BCF0FF199D97C3BBA4EFE9BCCBB84`
 - **Protection:** AACS ✓, BD+ ✓, BD-J ✓
 - **Titles:** 0 HDMV + 81 BD-J (81 "unsupported"); main title #36
@@ -114,6 +134,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 5. La La Land (Blu-ray)
 
 - **matrix256v0:** `364381f64015e1c3f22ae1b945c4f380e0ff3d2a418a654b878377666153ce05`
+- **matrix256v1:** `a8493743e418c15d677ed32855765f0b7c40a06a35e959a360951fa295426f44`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `A4E972BDF029F7E4CB48D75C96B2E5FC601D5229`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 93 HDMV + 10 BD-J (10 "unsupported"); main title #193
@@ -135,6 +158,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 7. Suicide Squad: Extended Cut (Blu-ray)
 
 - **matrix256v0:** `48dad7a2a1514ecadaee160a5782562560810d37dda2c727359d3c33fc088482`
+- **matrix256v1:** `c86815687c944160cb74079368b42bfb1dbe04375d5eb99fa4486ad53947840c`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `C4C849323E97963B49014C6F5C12159F54182B21`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✗
 - **Titles:** 12 HDMV + 0 BD-J (0 "unsupported"); main title #26
@@ -145,6 +171,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 8. Silicon Valley Season 1 — Disc 1 (Blu-ray)
 
 - **matrix256v0:** `765a3c735a1f2a486de96bdcb0f98cad314ba78c08e05eed0e3b7320ecbae248`
+- **matrix256v1:** `9e4edd18781705e74e089ae299dedd86c75d6d30cd5505555522c8b899748671`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `57163EBEC59D05A4A71F70723D0D6492EC5BC64A`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 2 HDMV + 79 BD-J (79 "unsupported"); main title #12
@@ -156,6 +185,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 9. Silicon Valley Season 1 — Disc 2 (Blu-ray)
 
 - **matrix256v0:** `c891cc3db59097f006bfdbca09fef42035898235b6e16ab5434610a1efb47d79`
+- **matrix256v1:** `8fccea4677fbc629ec982690b9ddaa3eaf08fa8ed27ff9c51c591fbb61e7712e`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `D3915434FDCABA94F5E16BB9E5018EB7CC309F22`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 2 HDMV + 79 BD-J (79 "unsupported"); main title #14
@@ -166,6 +198,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 10. Silicon Valley Season 2 — Disc 1 (DVD-Video)
 
 - **matrix256v0:** `a712a945fc6a406e70d4c5dc8da03e9ff554c8a045748766b70f04a329a3bbc3`
+- **matrix256v1:** `b06947aa46bc927c595eac46329518b06df7f0989c9371f479294fd16296d45f`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This is disk 1 of the Silicon Valley season 2 DVD box set.
 - **See also:** entry 11, the Disc 2 sibling from the same set.
@@ -173,6 +208,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 11. Silicon Valley Season 2 — Disc 2 (DVD-Video)
 
 - **matrix256v0:** `c4fff4d76b300ad00001f82871a6cd9914331612553f073e7f2cff43b1c6fe04`
+- **matrix256v1:** `92c4aeb0fa558dbc9bf6ceb1ddd1b894cb972efd1189cb5624e7ac8c6bd0f049`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This is disk 2 of the Silicon Valley season 2 DVD box set.
 - **See also:** entry 10, the Disc 1 sibling from the same set.
@@ -180,30 +218,42 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 12. Andromeda Season 1 — Disc 1 (DVD-Video)
 
 - **matrix256v0:** `a36d79234597315a41681a494d63b56aa820db531168d2906e024f4c3da277d9`
+- **matrix256v1:** `0dbab021fa4446f0070ef937956474a565ae5981f3b1d7f7c52f5af4a14d36fe`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
-- **Why it's here:** This is disk 1 of the Andromeda season 1 DVD box set.
-- **See also:** entries 13, 14, and 15 — the Disc 2, Disc 3, and Disc 4 siblings from the same set.
+- **Why it's here:** This is disk 1 of Season 1 of the Andromeda full series box set
+- **See also:** entries 13, 14, 15, and 62 — the Disc 2, Disc 3, Disc 4, and Disc 5 siblings from the same set.
 
 ## 13. Andromeda Season 1 — Disc 2 (DVD-Video)
 
 - **matrix256v0:** `a67241ef1da2ea9af53c09396ca029537012cb5d20272095747d3d8ca18b2501`
+- **matrix256v1:** `3b87f16a7539abea039747fa155070a886e63230a7c51f943f7e496978292b67`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
-- **Why it's here:** This is disk 2 of the Andromeda season 1 DVD box set.
-- **See also:** entries 12, 14, and 15 — the Disc 1, Disc 3, and Disc 4 siblings from the same set.
+- **Why it's here:** This is disk 2 of Season 1 of the Andromeda full series box set
+- **See also:** entries 12, 14, 15, and 62 — the Disc 1, Disc 3, Disc 4, and Disc 5 siblings from the same set.
 
 ## 14. Andromeda Season 1 — Disc 3 (DVD-Video)
 
 - **matrix256v0:** `d08a3e5bba2d4568646b8f7d0518aac7a7dd390c8b127e705adbd87492acdcd5`
+- **matrix256v1:** `479ed6ecdcef0e9d3979f1808310547b5b0191951f60bde49ead3a80fc182181`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
-- **Why it's here:** This is disk 3 of the Andromeda season 1 DVD box set.
-- **See also:** entries 12, 13, and 15 — the Disc 1, Disc 2, and Disc 4 siblings from the same set.
+- **Why it's here:** This is disk 3 of Season 1 of the Andromeda full series box set
+- **See also:** entries 12, 13, 15, and 62 — the Disc 1, Disc 2, Disc 4, and Disc 5 siblings from the same set.
 
 ## 15. Andromeda Season 1 — Disc 4 (DVD-Video)
 
 - **matrix256v0:** `7459e8c79c55f3ac8963447b9a04bdf738dff6cad677c833cc60f8b85f9316ee`
+- **matrix256v1:** `5cb204ec0a49967a99c4ccfaf551b56fa1faacdc6c9f5b6cc05fd2060175db84`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
-- **Why it's here:** This is disk 4 of the Andromeda season 1 DVD box set.
-- **See also:** entries 12, 13, and 14 — the Disc 1, Disc 2, and Disc 3 siblings from the same set.
+- **Why it's here:** This is disk 4 of Season 1 of the Andromeda full series box set
+- **See also:** entries 12, 13, 14, and 62 — the Disc 1, Disc 2, Disc 3, and Disc 5 siblings from the same set.
 
 ## 16. No Country For Old Men / Gone Baby Gone BD (Blu-ray)
 
@@ -586,6 +636,84 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 - **Files hashed:** 396
 - **Payload:** 35.39 GB STREAM, 4.2 MB JAR, 628 B BDJO
 - **Why it's here:** This movie is Venom: Let There Be Carnage (2021). Sequel to entry 60 (same franchise, different film, distinct retail pressing with its own Disc ID and fingerprint — not a matrix256v0 sibling in the corpus's normal pair sense, since the two are separate films rather than same-film-different-edition/medium). Sony/Columbia authoring pattern matches Venom 1 closely — heavy-HDMV-decoy style, 17 HDMV + 3 BD-J with the main feature at title #94, and 396 files hashed versus entry 60's 393 (within 1% of each other, suggesting both discs came off Sony's common BDMV template three years apart). **Notable dash inconsistency within the Sony "Blu-ray™" display-name convention**: this disc carries name `Venom: Let There Be Carnage - Blu-ray™` using an ASCII hyphen-minus (`-`, U+002D), where entry 60 (Venom 2018) used an en dash (`–`, U+2013). Same studio, same franchise, different authoring detail — a data point that the ™-suffix convention isn't character-consistent across even a single franchise.
+
+## 62. Andromeda Season 1 — Disc 5 (DVD-Video)
+
+- **matrix256v0:** `20386c7ea672554078b35c24d64b19b2bd593f4fbf12f68009156a22c954b558`
+- **matrix256v1:** `c57955e9951b9109ff662921649af1e4f98c2181450736727451b10823728ad0`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** Final disc of the Andromeda Season 1 box set, completing the five-disc set that began at entries 12–15. All five Season 1 discs share the same 3-VTS authoring (4 files hashed each — VIDEO_TS.IFO + VTS_01_0.IFO + VTS_02_0.IFO + VTS_03_0.IFO), so the matrix256v0 digests distinguish them purely on IFO content (chapter tables, audio/subtitle PGCs, navigation commands) rather than on file-list shape. A useful data point that the v0 algorithm picks up structural differences inside a uniform authoring template, not just gross shape changes.
+- **See also:** entries 12, 13, 14, and 15 — the Disc 1, Disc 2, Disc 3, and Disc 4 siblings from the same set.
+
+## 63. Andromeda Season 2 — Disc 1 (DVD-Video)
+
+- **matrix256v0:** `c1b87ae72253de1efd23d13e11c880ab9556d6e1b5093244db1f0791589f481e`
+- **matrix256v1:** `2633ef627235fd2cd496a0f06dac3cae74915b367fc6dbfd97755a6e8a746fcc`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** First Season 2 disc from the Andromeda full-series box set, paired by franchise with the Season 1 set at entries 12, 13, 14, 15, and 62. Despite coming from the same studio's TV-on-DVD release, Season 2 uses a different authoring template: 6 VTSes (7 files hashed — VIDEO_TS.IFO + VTS_01..06_0.IFO) versus Season 1's uniform 3-VTS layout (4 files hashed). A cross-season-within-a-set data point: matrix256v0 fingerprints don't just distinguish individual discs, they also surface authoring-pipeline shifts between seasons of the same series.
+- **See also:** entries 64 and 65 — the Disc 4 and Disc 5 siblings from the same Season 2 set.
+
+## 64. Andromeda Season 2 — Disc 4 (DVD-Video)
+
+- **matrix256v0:** `0089e5850b060e01babea962fe8305f6d6e2aee018f1f7f9dca892bcbc7c9e33`
+- **matrix256v1:** `b4c613fea1af47b665d6154685a72c90129d464fef60423c9b0135546f304484`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This is disk 9 of the Andromeda full series box set, containing Season 2 Episodes 16-20. Confirms the Season-2 authoring observation made at entry 63: same 6-VTS layout (7 files hashed — VIDEO_TS.IFO + VTS_01..06_0.IFO), distinct from the uniform 3-VTS layout shared by all five Season 1 discs (entries 12–15, 62). With two Season 2 discs now in the corpus, the "different authoring template per season" claim moves from a single-data-point observation to a confirmed pattern within this box set.
+- **See also:** entries 63 and 65 — the Disc 1 and Disc 5 siblings from the same Season 2 set.
+
+## 65. Andromeda Season 2 — Disc 5 (DVD-Video)
+
+- **matrix256v0:** `b9f4fba54b7f0c9c8d16a06328695104c857cc329c21bc09605b32488e8ddb1d`
+- **matrix256v1:** `312632a769502b387ec169ac7c6a1e23abe9de62d8e0e91fac4e69877ce80f17`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This is disk 10 of the Andromeda full series box set, containing Season 2 Episodes 21-22. Final Season 2 disc and the third Season 2 entry, alongside entries 63 (Disc 1) and 64 (Disc 4). Despite holding only the last two episodes plus presumed bonus material — a notably lighter content load than the other Season 2 discs — it still uses the same 6-VTS authoring template (7 files hashed: VIDEO_TS.IFO + VTS_01..06_0.IFO). Confirms the authoring template is stable across the entire Season 2 set, regardless of how full each disc actually is — a useful demonstration that matrix256v0's hashed-file count reflects the authoring shape, not the payload size.
+- **See also:** entries 63 and 64 — the Disc 1 and Disc 4 siblings from the same Season 2 set.
+
+## 66. Andromeda Season 5 — Disc 3 (DVD-Video)
+
+- **matrix256v0:** `7f72e16030ac6cd416ca1321b8f95ab46cf5e27b75eb4a6312c0f8ec4b80c166`
+- **matrix256v1:** `165a39a117c11220be1d0877ad4aa9c34ab46f4e9ddb67ed001a376fb7fc68e4`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This is disk 23 of the Andromeda full series box set, containing Season 5 Episodes 14-18. First Season 5 disc in the corpus, jumping past Seasons 3 and 4 to give the corpus a wider view of the box set's authoring history. Same 6-VTS template (7 files hashed: VIDEO_TS.IFO + VTS_01..06_0.IFO) as the Season 2 entries (63, 64, 65) — three seasons later, the studio's authoring pipeline still produces the same file-list shape, so the per-season template shift first observed between S1 (3 VTSes) and S2 (6 VTSes) was a one-time change rather than a per-season drift.
+- **See also:** entry 67 — the Disc 4 sibling from the same Season 5 set.
+
+## 67. Andromeda Season 5 — Disc 4 (DVD-Video)
+
+- **matrix256v0:** `2c7987a5776e2fc3a641e16c5c90de18942871db7c76b6e06cea74a691deb0b7`
+- **matrix256v1:** `67df7f03d11c86ac9c545d00499b0c74c879b91ed9def703edc0e5a51ffacbb6`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This is disk 24 of the Andromeda full series box set, containing Season 5 Episodes 19-22. Final Season 5 disc and the second Season 5 entry, paired with entry 66. Same 6-VTS authoring (7 files hashed) as every Season 2 and Season 5 disc the corpus has captured, reinforcing that the studio's post-S1 template was set once and stayed put. With a sibling now in place, the within-season distinctness check holds at S5 the same way it does at S2: matching template shape, distinct hashes — useful continuity across the four-year gap between when these two seasons were authored.
+- **See also:** entry 66 — the Disc 3 sibling from the same Season 5 set.
+
+## 68. Andromeda Season 3 — Disc 3 (DVD-Video)
+
+- **matrix256v0:** `f8b910aa68dfda89597b46af5ae5921b9e14fde9ef20581481cd8411a2f8db5e`
+- **matrix256v1:** `542701a3d6b16d5cdb4ed2668e3b421beb3d11685a2439a8d7c309b147b1079f`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This is disk 13 of the Andromeda full series box set, containing Season 3 Episodes 11-15. First Season 3 disc in the corpus, fitting between the Season 2 entries (63, 64, 65) and Season 5 entries (66, 67) and giving the corpus an interior season as well as endpoints. Same 6-VTS authoring (7 files hashed: VIDEO_TS.IFO + VTS_01..06_0.IFO) as every post-S1 disc the corpus has captured — strong evidence that the studio's authoring template was set once at the S1→S2 boundary and held steady through the entire remainder of the box set.
+
+## 69. Andromeda Season 4 — Disc 2 (DVD-Video)
+
+- **matrix256v0:** `471776d99f6997a61017c7f68a679472eb50f90d94abc99ae1f6e2af1f2a70bd`
+- **matrix256v1:** `fe8dafb8bfc89d74150f96859f3eaf147f09b26965fe6837dc2d20b30e0a6c05`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
+- **Structure:** DVD-Video, VIDEO_TS layout
+- **Why it's here:** This is disk 17 of the Andromeda full series box set, containing Season 4 Episodes 6-10. First Season 4 disc in the corpus; combined with the Season 2, 3, and 5 entries already in place, the corpus now covers all of the box set's post-Season-1 seasons. Same 6-VTS authoring (7 files hashed: VIDEO_TS.IFO + VTS_01..06_0.IFO) as every other post-S1 disc captured here, leaving Season 1 (3 VTSes / 4 files hashed) as the lone outlier and the S1→S2 boundary as the only authoring shift in the entire 25-disc set.
 
 ## Reproducing a fingerprint
 
