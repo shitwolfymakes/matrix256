@@ -258,6 +258,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 16. No Country For Old Men / Gone Baby Gone BD (Blu-ray)
 
 - **matrix256v0:** `795d32f567b931b1a4d4912db10a3191ef3b2faf203283470480e13c07794241`
+- **matrix256v1:** `619dda39e24e39aaf684db381087dc00a96f38a818974d73a62502e87214468f`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `7BFBDC2177C6E3139FDE37AAF2FB424049BB654B`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✗
 - **Titles:** 26 HDMV + 0 BD-J (0 "unsupported"); main title #8
@@ -268,6 +271,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 17. Afro Samurai (Blu-ray)
 
 - **matrix256v0:** `f1e1bd8385e39c397dd980b7acd745d410dfdedad7adb7b3dcce8072f3a3be9e`
+- **matrix256v1:** `d84410cd34299fb0f19c98cfa1b068a8fe8a06eeb8623a5ebb61aef165762623`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `F2A6F9BBE8A7060FF0FEF1D5F9623C8D8EB20EB4`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✗
 - **Titles:** 29 HDMV + 0 BD-J (0 "unsupported"); main title #9
@@ -278,24 +284,36 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 18. Four Brothers (DVD-Video)
 
 - **matrix256v0:** `b9b566fa01ce0730783d3b051d7618db16da96b4a680ff069e6cb3f04198cf13`
+- **matrix256v1:** `a77e33ca0c738026ee5678dea046094ba0e06c47a4813d9a0907dd822ec8b7c4`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** First commercial feature-film DVD in the corpus (prior commercial DVDs were TV-series box sets). Has the most VTSes (8) and the largest `VIDEO_TS.IFO` (22 KB) of any DVD in the corpus so far, exercising a broader slice of the DVD-Video navigation layout than the leaner box-set discs.
 
 ## 19. Munich (DVD-Video)
 
 - **matrix256v0:** `49ff13400488f1e0a79c2a5360eb64abb9841c21b87999043bf5af2f79c444e9`
+- **matrix256v1:** `0760f9c709df671806bdf18367c0dd5b7d1059fb0536d47ce1f7461d8090596e`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** Minimal-VTS commercial feature-DVD — a dual-layer (DVD9) pressing where the entire 2h43m feature plus a short trailer live in just 3 VTSes, with `VTS_01_0.IFO` at 104 KB (second-largest IFO in the DVD corpus). Contrasts with Four Brothers (entry 18, 8 VTSes) as the simple-authoring end of the commercial-feature-DVD spectrum.
 
 ## 20. Argo (DVD-Video)
 
 - **matrix256v0:** `3b04b8bab8c7c50d54e57e06a734b2f00df4a77927c898dff389fadf5d950478`
+- **matrix256v1:** `47f42927f02d465a3b5638c3b0368b8602e8b8f49c27c42444a64429bbc3eb7e`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** Second minimal-VTS commercial feature DVD in the corpus: like Munich (entry 19), a DVD9 Warner pressing with 3 VTSes and the entire feature (2h00m) living in `VTS_01`. Different `VTS_01_0.IFO` size (94 KB vs 104 KB) and different fingerprint despite the shared authoring pattern — another per-edition distinction data point. Title #5 / #6 audio-language fields carry non-UTF-8 bytes from the disc's raw IFO strings, which prompted a `errors="replace"` hardening in `inspect_disc.py`'s lsdvd subprocess decoding.
 
 ## 21. American Gangster (DVD-Video)
 
 - **matrix256v0:** `50426f73dbc0eb3b29366e73e54c76e9925944819840be6a5bccd93db51d4618`
+- **matrix256v1:** `c0f274226217b48df1fe3e5832337b12a1f0f83da1af32199f71a05cb54f5795`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** First seamless-branching disc in the corpus. A single VTS_01 carries the video payload for two distinct DVD titles — the 2h55m40s extended cut and the 2h36m49s theatrical cut — stitched together from different cell orderings (MakeMKV reports 30 segments per title, the classic seamless-branching signature). Exercises a DVD authoring pattern the corpus previously lacked: two alternate cuts co-resident on one disc via shared VOBs rather than separate VTSes (contrast with Suicide Squad theatrical/extended at entries 6-7, which ship on two discs).
 - **Why the tools report it as "ASDF":** Neither lsdvd, MakeMKV, nor udisksctl surface the film title — they all fall back to "ASDF" because both the VMG disc-title field (inside `VIDEO_TS.IFO`) and the UDF volume name were left as that placeholder by Universal's authoring team. DVD-Video's VMG disc-title is a studio-populated string with no functional role in playback, so it's frequently shipped blank or placeholder — which is why `inspect_disc.py` can't recover the film title from the disc alone for this pressing.
@@ -303,18 +321,27 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 22. Casablanca (DVD-Video)
 
 - **matrix256v0:** `8ef7dba2bdbf4ac926a6faedc2ad22e5bcf29e6050988f53a543e3a9b89ff04e`
+- **matrix256v1:** `29db4a6accb47857c466954db48a2ddb816078e8c4fa1c0c0b8eb5efe09b0868`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** Minimum-VTS commercial feature DVD — 2 IFOs hashed (`VIDEO_TS.IFO` + one `VTS_01_0.IFO`), the fewest of any commercial feature in the corpus. The 1h42m feature, a 36m44s bonus documentary, and ~10 short supplements all live in a single `VTS_01` with a dense `VTS_01_0.IFO` (116 KB) carrying the navigation for 14 chapter-addressed titles. Warner Home Video authoring, DVD9 payload. Sharpens the sparse end of the commercial-feature-DVD structural spectrum below Munich (entry 19, 3 VTSes) and Argo (entry 20, 3 VTSes).
 
 ## 23. Pitch Perfect (Aca-Awesome Sing-Along) (DVD-Video)
 
 - **matrix256v0:** `0766b920ec352286950fb972eddf59f2695ebfc8c698838f3a8537b209e40c81`
+- **matrix256v1:** `65b1c4e21b0fb6c8f003b76e5e7c6f35e4833643efb89e07acc29b030f0ea1bc`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This is the Aca-Awesome release of Pitch Perfect. Second seamless-branching disc in the corpus, but a different flavor than American Gangster (entry 21): both branches have identical duration (1h51m38s), same source VTS, same 35-segment map — the two titles are the same film played back with different default audio/subtitle selections (regular track vs sing-along). Confirms matrix256v0 handles seamless-branching authoring identically regardless of whether the branches differ in runtime or only in default stream picks.
 
 ## 24. Heat (DVD-Video)
 
 - **matrix256v0:** `1983932253e4116af6606d4244256b1ce5d4ba0dc4cbb9686f22d8ae409ccab0`
+- **matrix256v1:** `0d8a97f7308923cbbe1ea2c03e90f72ca426a27b6f386d559548924d70466a5f`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** Second minimum-VTS commercial feature DVD — same single-VTS Warner Home Video authoring pattern as Casablanca (entry 22), different feature (2h50m vs 1h42m), more chapters (52 vs 36), slightly smaller `VTS_01_0.IFO` (110 KB vs 116 KB), distinct fingerprint. Gives the "minimum-VTS" axis two data points across very different eras (1942 catalog release vs 1995 theatrical). Notable curiosity: the UDF volume label `HEAT_16X9LB_DUAL_LAYER_NA` encodes the aspect ratio (16:9 letterbox), disc type (DVD9 dual layer), and region (North America) directly — one of the most descriptive volume labels in the corpus.
 - **See also:** entry 58, the 2017 "Director's Definitive Edition" Blu-ray re-release of the same film — a cross-medium and cross-edition sibling.
@@ -322,54 +349,81 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 25. Stonehenge Apocalypse (DVD-Video)
 
 - **matrix256v0:** `5e0e5f5de53fce798cd9093df32051865fe452c2459cd09f257312caad1b5004`
+- **matrix256v1:** `dbf83e45a121e8f55cea704d023f343e93250dfed9bcf64f5bfef223b86b6ea2`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** Here's an obscure, D-Tier movie called Stonehenge Apocalypse. First single-layer (DVD5) commercial feature in the corpus — total VOB payload is ~4.5 GB across 4 VTSes, comfortably fitting DVD5 capacity, where every previous commercial feature in the corpus is DVD9. Also notable: MakeMKV reports the disc name as "Stonehenge Apocalypse" (proper capitalisation, with space) rather than the UDF volume label, confirming the VMG disc-title field *is* populated correctly when studios bother to set it — a clean counterpoint to American Gangster (entry 21) where that same field was left as "ASDF".
 
 ## 26. Madso's War (DVD-Video)
 
 - **matrix256v0:** `cbf05563e0fbf73eba871d8f8cf94be685a7fdc59dadbc65a672679ba62fe8b9`
+- **matrix256v1:** `b6cdc167580c724453191a91e907bf31c6b30e437888bd1842638efc19c05016`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is called Madso's War. Second DVD5 commercial feature in the corpus (alongside Stonehenge Apocalypse, entry 25) — ~4.1 GB of VOB payload fitting single-layer capacity, a 1h25m feature, and five shallow VTSes with the feature material in `VTS_03`. Unlike Stonehenge Apocalypse, this pressing left the VMG disc-title field unset, so MakeMKV falls back to the UDF volume label `MADSOS_WAR` — another data point for the "VMG disc-title is studio-discretionary" observation (contrast entries 21 and 25).
 
 ## 27. VANish (DVD-Video)
 
 - **matrix256v0:** `e90c7a1341c8ef43b01188b28fa335bad846dbe131b3e58768e43b8afe621943`
+- **matrix256v1:** `278f7f7c002b81fa9b49f9dcb946318a5c61f1b3bcda9d3d7ce3e921c0ea21db`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is VANish (2015).
 
 ## 28. Treasure Guards (DVD-Video)
 
 - **matrix256v0:** `a75a01a298decf62788c7175cdea2e0aa91a3a9af02bd8da1fbee1ee2715a30c`
+- **matrix256v1:** `83adcfa241ca84d9521c3e021eb7a17c597063cc04f7c5cc416bb7623f8c6ad0`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is Treasure Guards (2011). Third DVD5 commercial feature in the corpus (alongside entries 25 and 26) — ~3.9 GB payload across just 2 VTSes, the minimum VTS count for any DVD5 entry here. Also notable for audio/subtitle language codes reported as `xx` (unset) by lsdvd, unusual compared to the properly-tagged `en/es/fr` of higher-budget pressings — consistent with lean authoring on low-budget releases.
 
 ## 29. The Reading Room (DVD-Video)
 
 - **matrix256v0:** `111878a8ecdcc09b9dca5b1f889c76f986b703a3c24adf77c7d86c0dd68ad5b4`
+- **matrix256v1:** `5bd8aa43f01060aa5073fed1172d1963512ebdff0cd7986d59ab82028d48b20c`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is The Reading Room (2005). Fourth DVD5 commercial feature in the corpus and a near-identical structural twin of Treasure Guards (entry 28): same 3-IFO / 2-VTS layout, `VTS_01_0.IFO` within 2 KB of its match (70 KB vs 72 KB), both `xx` audio/subtitle language codes, both with `Provider ID` set to the volume label — yet the two fingerprints differ completely. Sharpens the sibling-distinction observation at the low-budget template-authoring end of the DVD spectrum.
 
 ## 30. The Secret (DVD-Video)
 
 - **matrix256v0:** `1dc7a2d76e69093e63801922272f03aad9b6f70c4c97644a0cc622938770f340`
+- **matrix256v1:** `702cf99802d9c162633afe44b789f3d209f238f124f448bc06177cfc7abba267`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is The Secret (2006). Most VTSes of any DVD in the corpus — 12 VTSes and 13 IFOs hashed — yet still DVD5 (~4.2 GB total payload). Unusual authoring: the 1h30m feature lives in `VTS_05` (`VTS_05_0.IFO` 78 KB), while each short extra (from 30 seconds to 8 minutes) is isolated in its own dedicated VTS with an identical 18 KB IFO. Extends the high end of the DVD VTS-count axis (previous max was Four Brothers's 8 VTSes at entry 18).
 
 ## 31. The Endless Summer (DVD-Video)
 
 - **matrix256v0:** `448a1cb79358460ac3304c065868d989f03ed85de907497daf3ed43162a42bf7`
+- **matrix256v1:** `4a64da80ed64f91c9ad480601ab3ce0696ae5c98c88ef081d6d76ab0687949c6`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is The Endless Summer (1966). Sixth DVD5 commercial feature in the corpus, and the first disc carrying a true **mono (1-channel) audio track** — a 1966 surf documentary preserving its original single-channel mix, where every previous corpus disc ships stereo (2ch) or 5.1 (6ch). Structurally aligned with the 3-IFO / 2-VTS template of entries 28-29 but with a larger `VTS_01_0.IFO` (80 KB, reflecting the feature's 20 chapters) and a properly-tagged `en` language code — a counter-example to the "xx" unset pattern seen on other low-budget pressings.
 
 ## 32. Space Camp (DVD-Video)
 
 - **matrix256v0:** `310ac2bd337c2c73e03f324ee7d3514602babb2780d5f2f79af63bba875b6512`
+- **matrix256v1:** `f07436197a30b71f176df359f2eff05e68a66aafc78cd6a337adcae8403af7b0`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is Space Camp (1986). Seventh DVD5 commercial feature in the corpus — 3-IFO / 2-VTS layout shared with entries 28, 29, 31, but the first disc with a third-party authoring-house Provider ID (`LASERPACIFIC MEDIA CORPORATION`) rather than a studio name or a self-referential label. Minor but real axis: discs outsourced to a mastering vendor get the vendor's ID stamped into VMGI, distinct from the self-authored studio pattern (Warner Home Video etc.) and the "placeholder-equals-label" pattern of the very low-budget discs.
 
 ## 33. The Adventures of Milo and Otis (DVD-Video)
 
 - **matrix256v0:** `0005cb727f4851ec9c6ab5467af51634d7a2c7a0ba803d06a4b9e251870ed70e`
+- **matrix256v1:** `3633a182f1f833e27262a54443b83d2f7dd5e12c32ca49c56f47cfca5fd56b03`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is The Adventures of Milo and Otis (1986) — specifically the American release, which is Columbia's re-cut-and-redubbed version of the 1986 Japanese film *Koneko Monogatari* (*The Adventures of Chatran*), with a shorter runtime, Dudley Moore narration, and new credits. That makes this disc a new regional-release axis: the underlying work is Japanese but the pressed edition is a distinct American derivative, with its own authoring chain and its own matrix256v0 digest independent of any Japanese or international pressing.
 - **Structural note:** Cleanest DVD authoring in the corpus — 2 IFOs hashed, a single VTS, a single title, no bonus/extras/menus VTS at all; just the 1h15m feature and the VMG entry. An unusual VMG-disc-title pattern too: properly populated as "The Adventures of Milo and Otis" despite the UDF volume label being a generic default `DVD_VIDEO` (contrast American Gangster at entry 21, where *both* were placeholder, and Stonehenge Apocalypse at entry 25, where both were meaningful). Ideal floor on the authoring-complexity axis.
@@ -377,18 +431,27 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 34. Space Odyssey: Voyage to the Planets (DVD-Video)
 
 - **matrix256v0:** `4ba6b0c730a105a1b2303c7b04e7d939a235939eebc1dffe3d1f43a4aec7227c`
+- **matrix256v1:** `7bc44e82f9e2c2b55c79f1032c8f24299d8cde17ddf30cf8eff2f09f8126d0d2`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This is the dvd release of Space Odyssey: Voyage to the Planets (2004), a two-part docu-drama. Interesting play-all authoring: the disc exposes both the individual episodes (titles #9 and #10, ~59 minutes each) and a separate concatenated 1h57m "both episodes back-to-back" title (#8, exactly twice the episode runtime). `VTS_04_0.IFO` at 178 KB is unusually large, reflecting the extra navigation tables for this compound-title arrangement. Also a new label axis: the UDF volume name and VMG disc-title are both just `E2194`, a distributor catalog/SKU number — distinct from the studio, placeholder, title-as-label, and authoring-house patterns already in the corpus.
 
 ## 35. Five Fingers (DVD-Video)
 
 - **matrix256v0:** `0c28f606ac8b466b2e5992c495ba843b545b2a98be23835c835b908eff92c10f`
+- **matrix256v1:** `0dd4d0aa7612f1e37a6841d1852d1211b5c65097fd40ae6395bad00955200292`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is Five Fingers (2006). Eighth DVD5 commercial feature in the corpus — 7 IFOs hashed, feature in `VTS_01` (~3.7 GB, `VTS_01_0.IFO` 70 KB — same size as entry 29), with five smaller VTSes carrying menus and short extras. Partial language-code tagging (feature is `en`, most bonus titles are `xx`) — a new pattern midway between the fully-tagged and fully-placeholder DVDs earlier in the corpus.
 
 ## 36. Whiskey Tango Foxtrot (DVD-Video)
 
 - **matrix256v0:** `68e1e31d648edc8d1c943e4b21955227e0c336782a13e12e0529d8f1de0ac12d`
+- **matrix256v1:** `2c6b66a50b9b912f3a74b85c4699df68dddc7bd4ede9001d48e17557aeef3d30`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is Whiskey Tango Foxtrot (2015), it is the DVD disk of a DVD/Blu-ray combo pack. First "combo-pack DVD side" data point in the corpus — a modern retail pattern where the same film ships on both formats in a single SKU, and the DVD side often has lighter authoring than a standalone DVD release. Structurally a standard DVD9 feature disc (6 IFOs, feature in `VTS_05` with a 72 KB IFO spanning 8 VOBs / ~6.4 GB), with MakeMKV reporting 3 segments on the main title — likely a layer-break cell split rather than seamless-branching.
 - **See also:** entry 37, the Blu-ray side of the same combo pack — first cross-format sibling pair in the corpus.
@@ -396,6 +459,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 37. Whiskey Tango Foxtrot (Blu-ray)
 
 - **matrix256v0:** `7520a70f5d9646d5b9363c5001b918231a9af00e15b53e226649cde98d6ff571`
+- **matrix256v1:** `fda666d139227a480e1c10a7249f60cb3911487fe28f6cd10e140c3bc61cace8`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `33BBB49A812E43775553DD8B45083CE9482AE63B`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 3 HDMV + 78 BD-J (78 "unsupported"); main title #1
@@ -407,6 +473,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 38. Cowboys & Aliens (DVD-Video)
 
 - **matrix256v0:** `44bb1b63ee48d1e83fd902634923ace473cb862c030046536b71f75563b9a06d`
+- **matrix256v1:** `2a984e0bd35bec8326cc53379ac4ec54e4819f38a48ecadb480603834fb27584`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is Cowboys & Aliens (2011), it is the DVD disk of a DVD/Blu-ray combo pack. Second combo-pack DVD side in the corpus (after Whiskey Tango Foxtrot at entry 36) — same DVD9 + combo-pack authoring family but with more VTSes (9 IFOs hashed vs 6), with the feature in `VTS_08` (`VTS_08_0.IFO` 26 KB, 6.8 GB VOB span) and a dense `VTS_07_0.IFO` at 82 KB carrying the bonus-feature navigation. MakeMKV again reports 2 segments on the main title — likely the layer-break cell split consistent with entry 36's pattern.
 - **See also:** entry 39, the Blu-ray side of the same combo pack.
@@ -414,6 +483,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 39. Cowboys & Aliens (Blu-ray)
 
 - **matrix256v0:** `04c192e9e34ee28d765f1addb7d5268e39866e28c0634985c4fbff32a32090c5`
+- **matrix256v1:** `7c3a12dd0a1ecefce874a0f0475c8ebcf2ad1136aa986c4cd6b4ef540f638643`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `9597816567B81882E27FE5321307D50630894626`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 6 HDMV + 75 BD-J (75 "unsupported"); main title #106
@@ -425,6 +497,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 40. Life of Brian (Immaculate Edition) — Disc 1 (DVD-Video)
 
 - **matrix256v0:** `1391d48490beb787b88ab29a9ac70a94ce8bb05bc552d56173a9d0192b6dc5fd`
+- **matrix256v1:** `1516583b7e3dc8c387adda5a79ec86111a76abf1dd290baea1ad91181328b919`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is The Immaculate Edition of Monty Python's Life of Brian (1979), it is the DVD disk of a DVD/Special Features combo pack. Introduces a third multi-disc-set flavor into the corpus: not a TV box (entries 8-9, 10-11, 12-15), not a cross-format combo pack (entries 36-37, 38-39), but a *main-feature + bonus-disc* two-disc pairing — both are DVDs, but only one carries the movie and the other is entirely extras. Feature in `VTS_01` (~6.4 GB, 8 VOB split, 32 chapters), DVD9. Notable label quirk: the UDF volume identifier is the multi-field string `LIFE_OF_BRIAN_DISC1` while the volume *label* read by `lsblk` is the space-containing `Life of Brian` — this surfaced a latent bug in `inspect_disc.py`'s `/dev/srN` path (udisksctl reports the mount point with `\x20` escapes for spaces, which the script currently takes literally, breaking VIDEO_TS detection; passing the already-mounted path directly works around it).
 - **See also:** entry 41, the Bonus Disc from the same set.
@@ -432,6 +507,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 41. Life of Brian (Immaculate Edition) — Bonus Disc (DVD-Video)
 
 - **matrix256v0:** `8948ddb848b10920e3a121b861da36c665d5be9a4e62e0887160804fd0b1a2b4`
+- **matrix256v1:** `3ee2344cc794c08ad86d03ce080f8fd64f2a702b1fc53136ac7d42e377d64564`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is The Immaculate Edition of Monty Python's Life of Brian (1979), it is the Special Features of a DVD/Special Features combo pack. Pairs with entry 40 as the extras-only half of the main-feature + bonus-disc arrangement — and sets a new corpus record for DVD VTS count: **14 IFOs hashed across 13 VTSes**, beating The Secret (entry 30, 12 VTSes). Bonus/special-features discs are the natural high end of this axis because each featurette or segment commonly gets its own VTS. Provider ID `LIFE_OF_BRIAN_DISC2` confirms the disc's role within the set, and the VMG disc-title is set to the full "Life of Brian: Bonus Disc" — another example of a properly-authored VMG title field.
 - **See also:** entry 40, the main feature Disc 1 from the same set.
@@ -439,6 +517,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 42. Interstellar (Blu-ray)
 
 - **matrix256v0:** `4de5afe506d8237da4ffd373fa0b074e61d66098d9b7bffdc2991e50dccee176`
+- **matrix256v1:** `25ca634dbcdc9adb19b42ce6d638b2322ce927faeb05e50b966d088b87691141`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `B7D228759201D315B2294F41388450849DF3A7C3`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 2 HDMV + 79 BD-J (79 "unsupported"); main title #8
@@ -450,6 +531,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 43. Interstellar Bonus Disc (Blu-ray)
 
 - **matrix256v0:** `644e337805e7f8c5c8a5f352c1866029b56965268e5724c05753fe58ed8bafaf`
+- **matrix256v1:** `263efa6d97eee52fb573fa8ca5c08d7adcc601c582822878dd1a280463f545e5`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `67FE296CE298C6A5DAB8C3AB9263CB99EA3C0023`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 2 HDMV + 79 BD-J (79 "unsupported"); main title #15
@@ -460,6 +544,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 44. Hancock (Blu-ray)
 
 - **matrix256v0:** `197587826e6f8878461d5c9a16bd10eb072ccaba83aed12f29844ffa1e59c2e4`
+- **matrix256v1:** `ef93c20e21d3de00e13d79296a7f844b959aefb4c006c4559660a14e207e2ee0`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `358B99E382B0FA7AAEB2E45246AB96CD6803E961`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 495 HDMV + 5 BD-J (5 "unsupported"); main title #161
@@ -471,6 +558,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 45. Hancock Bonus Disc — Digital Copy (DVD-Video)
 
 - **matrix256v0:** `0ac9eb0a5ef61c3265c25bb751bcb1acd19d60cccb391014e985254cfc80e29d`
+- **matrix256v1:** `5ef8beb9e3a17675f9298f2c434c65d24bb2c0d10f302d565a65782bcfd4a0ab`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout (stub) + `Movies/` directory carrying the real payload
 - **Why it's here:** This movie is Hancock (2008), it is the Digital Copy bonus disk of a Blu-ray/Digital Copy combo pack. First **Digital Copy disc** in the corpus and the first hybrid disc whose real payload lives *outside* matrix256's hashed set. The actual Digital Copy content (an 874 MB `Movies/HancockBD_2008_PC.wmv` for PC sideloading, a 727 MB `Movies/MAQ00579.MGV` for portable devices, and a `bonuscopy.exe` Windows installer with autorun) sits in the disc root under `Movies/`, while the `VIDEO_TS/` tree carries only a token 30 MB of menu/stub VOBs across 3 short titles (27s, 15s, 16s) — exactly enough to make the disc appear as a valid DVD to players that probe for `VIDEO_TS.IFO`. Useful stress test of the spec's scope: matrix256v0 cleanly reports a stable fingerprint (`0ac9eb0a…`) over the 4 IFO files (76 KB total) but is blind to the 1.6 GB of actual content in `Movies/`. Smallest-IFO VIDEO_TS in the corpus (previous floor: Milo and Otis at entry 33, 2 IFOs but a 2.6 GB VOB feature).
 - **See also:** entry 44, the main-feature Blu-ray side of the same combo pack.
@@ -478,6 +568,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 46. Rio (Blu-ray)
 
 - **matrix256v0:** `8277bdc316a3cde523b0b6a4e75251ae31613ccda12219fd637dc1d0d510587b`
+- **matrix256v1:** `1015aa690bbca5403946a39e50d092cd8016a32769fb5757b0444b2c67438e60`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `2B04F0049EC70196BCFC2199A047A6E849B84A4F`
 - **Protection:** AACS ✓, BD+ ✓, BD-J ✓
 - **Titles:** 5 HDMV + 86 BD-J (86 "unsupported"); main title #85
@@ -489,14 +582,20 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 47. Rio Digital Copy (Data disc — out of scope)
 
 - **matrix256v0:** not computed — disc has no `VIDEO_TS/` or `BDMV/` directory
+- **matrix256v1:** `c9c14e70e279f5ac0d03eb4ada2b581627576de1a0139207a8b757620eb65b33`
+- **Filesystem view:** iso9660 on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,norock,check=r,map=n,blocksize=2048,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Filesystem:** ISO 9660 (not UDF), volume label `Fox Digital Copy`
 - **Structure:** pure Windows/iTunes sideload layout — `Autorun.inf` + `Click to START.bat` at the root, a Windows-installer `DVDROM/menu.exe` (12 MB), a `DVDROM/iTunesInfo.xml` manifest, and a `DVDROM/Media/` directory carrying three video files: a 1.4 GB `FeatureMovie` (iTunes sideload), a 1.1 GB `Rio.wmv` (PC Windows Media), and a 488 MB `Rio - Portable.wmv` (portable-device Windows Media).
-- **Why it's here:** This movie is Rio (2011), it is the Digital Copy disk of a Blu-ray/Digital Copy combo pack. **First negative data point in the corpus** — the first disc that matrix256v0 explicitly cannot fingerprint, and a clean illustration of the spec's scope boundary. Unlike the Hancock Digital Copy (entry 45), which ships a 30 MB stub `VIDEO_TS/` and *does* produce a stable digest, Fox's Rio Digital Copy has no DVD-Video or Blu-ray directory tree at all; the disc is a conventional iso9660 data carrier for the Windows sideloading installer and its accompanying media payload. `inspect_disc.py` reports `Disc type: unknown` and `No fingerprint input files found` — the correct behavior under the current spec. Useful corpus fixture for documenting that matrix256v0 is not a general-purpose disc identifier: combo-pack Digital Copy sides authored as pure data discs fall entirely outside its coverage. A future revision of the spec could extend to iso9660 content hashing (e.g., hash the Media directory in canonical order), but that would be a separate algorithm, not a parameter of v1 (see the README's `format_version` rationale).
+- **Why it's here:** This movie is Rio (2011), it is the Digital Copy disk of a Blu-ray/Digital Copy combo pack. **First v0-negative / v1-positive split in the corpus** — the first disc that matrix256v0 explicitly cannot fingerprint while matrix256v1 (filesystem-agnostic) cleanly does. Unlike the Hancock Digital Copy (entry 45), which ships a 30 MB stub `VIDEO_TS/` and produces a v0 digest from those token IFOs, Fox's Rio Digital Copy has no DVD-Video or Blu-ray directory tree at all; the disc is a conventional iso9660 data carrier for the Windows sideloading installer and its accompanying media payload. `inspect_disc.py` reports `Disc type: unknown` for v0 selection (`No fingerprint input files found` — correct behavior under v0's spec) but successfully fingerprints the entire `(path, size)` filesystem tree under v1. Concrete demonstration of v0 and v1 covering complementary scopes: combo-pack Digital Copy sides authored as pure data discs fall outside v0's structural-DVD/BD coverage but are well within v1's filesystem-agnostic reach.
 - **See also:** entry 46, the Blu-ray side of the same combo pack.
 
 ## 48. The Perks of Being a Wallflower (Blu-ray)
 
 - **matrix256v0:** `e52e19afa45b4187fd696aa9291d9d0099ea847d13d0bf697b1065cdb8b788e0`
+- **matrix256v1:** `7cdd87bcf81522d90367fd3d5251f5ecea88f0f196acef447fc1ec33b7fa3b0f`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `45A6A92DF2ABCB9F12FD801942715A4262F318AF`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 1 HDMV + 2 BD-J (2 "unsupported"); main title #5
@@ -507,6 +606,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 49. Wall Street: Money Never Sleeps (Blu-ray)
 
 - **matrix256v0:** `d116231aa628691e8dfa9a480fe8f0f52f1b4982d56665d244b7d76318d01494`
+- **matrix256v1:** `307da4dc33c152a273475f1540c485550139680ee4dae97845904f28017138f5`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `759BE8DD378DA5CFABEFFDE04A6D1B47F1CEB466`
 - **Protection:** AACS ✓, BD+ ✓, BD-J ✓
 - **Titles:** 1 HDMV + 89 BD-J (89 "unsupported"); main title #23
@@ -517,6 +619,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 50. Sherlock Holmes (Blu-ray)
 
 - **matrix256v0:** `6866e4562f5ef3e349d9688c952b59d5ad2f4d83b7a1687a250caca366cb9987`
+- **matrix256v1:** `6f4703d22731e06cfa651e2c5b28f3951ca4a7e7c2784459139cf957ac8797e0`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `0428B276B4B31A03F05E896F5BCD8251A1B583B0`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 13 HDMV + 7 BD-J (7 "unsupported"); main title #1
@@ -527,6 +632,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 51. Sherlock Holmes: A Game of Shadows (DVD-Video)
 
 - **matrix256v0:** `48df27e93c8cce0cd3e2c25d229b20ebe0682452261d06c7c5752144ba409ef5`
+- **matrix256v1:** `f5054d9cfd64a2f87fc111e40e5f046507a8d1f79548a4b3cd8ec71b3f3d1942`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **Structure:** DVD-Video, VIDEO_TS layout
 - **Why it's here:** This movie is Sherlock Holmes: A Game of Shadows (2011), it is the DVD disk of a Blu-ray/DVD combo pack. Third combo-pack DVD-side entry in the corpus after Whiskey Tango Foxtrot (entry 36) and Cowboys & Aliens (entry 38). Warner Home Video authoring with a DVD9 pressing (VTS_01's feature spans 7 VOBs hitting the 1 GB split boundary seven times, ~7.1 GB total), 2h08m feature in title #1, and a second (84 KB) `VTS_01_0.IFO` among the larger navigation tables in the DVD portion of the corpus. Titles 4, 5, and 9 show replacement-character audio/subtitle language tags (`��`) from non-UTF-8 bytes in the raw IFO strings — a live re-triggering of the `errors="replace"` hardening first added for Argo (entry 20). Note: despite the shared "Sherlock Holmes" franchise name, this is **not** a sibling of entry 50 (the 2009 first film is a different release on a different medium).
 - **See also:** entry 52, the Blu-ray side of the same combo pack.
@@ -534,6 +642,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 52. Sherlock Holmes: A Game of Shadows (Blu-ray)
 
 - **matrix256v0:** `5a679c6ac6bdbec711737c84609741f12e91cfb7578773da2e94841eb3d1631f`
+- **matrix256v1:** `6eb6ed7546f58372ca93b3d74875540c07b95d5a27bbe0bc957a9a2923941e54`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `7C9AE4D1301AF39884E662F268CC21E37DDADA1D`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 33 HDMV + 8 BD-J (8 "unsupported"); main title #28
@@ -545,6 +656,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 53. Star Trek (Blu-ray)
 
 - **matrix256v0:** `a4bd65922e6f43ea7e0fdb0cd785352cee4c68acef7f55e43ed3adc0bc4c1b9b`
+- **matrix256v1:** `6e0ac21f4d92e5899941412426f5d7b6166bb4d084422ef388fa0d1fe62c66ed`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `DB9E3EC5301078F3838AD6B6A1BDE03BF718A2EF`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 2 HDMV + 79 BD-J (79 "unsupported"); main title #2
@@ -556,6 +670,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 54. Star Trek — Special Features (Blu-ray)
 
 - **matrix256v0:** `8e62efd433b4cc1b827acb16c08d2ec5e5c9bf41f96693e3ab5e1947e51441bb`
+- **matrix256v1:** `a465de7abf2273abbba55d1f176b9ba125b1ac5d7345113c554b119c2b9eb550`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `3AC37FE2F91568AF8196929D3EBCE4391A0FE5AB`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 1 HDMV + 4 BD-J (4 "unsupported"); main title #12
@@ -568,6 +685,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 55. Kingsman: The Secret Service (Blu-ray)
 
 - **matrix256v0:** `91dea3e126b1e10aeedb5e162ee31eab1b27ead197a21f9cda9c6b2767bea056`
+- **matrix256v1:** `1b2ede79f6704b248accf9534d56158df6f4ac913312b47f4612dbf9d6f6ddbc`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `6B20E607ADEB48E70B4957009A7D55F77177A5C7`
 - **Protection:** AACS ✓, BD+ ✓, BD-J ✓
 - **Titles:** 5 HDMV + 86 BD-J (86 "unsupported"); main title #82
@@ -578,6 +698,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 56. Inglourious Basterds (Blu-ray)
 
 - **matrix256v0:** `3f2f35622727235ff8da4489154d914e791a9b64e504844c1f07649b722881d9`
+- **matrix256v1:** `1ad3f19fe7d33deebb834fd73e0e55a686696b82b6be422c4caf68cb5d61a515`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `7C7D5E77A01D02B281852AB291780D5D9099E140`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 2 HDMV + 79 BD-J (79 "unsupported"); main title #67
@@ -588,6 +711,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 57. 9 (Blu-ray)
 
 - **matrix256v0:** `e19bb80dc86a1b00c57546959c7cac3395681fa4ccb3d7fd255de2312e4dcfda`
+- **matrix256v1:** `fbd0fc6db5840c370a2f4ae5d5bb0974c7e0aff1860d088b91bd2693e849ea77`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `90F0D1833F56BB9E701E3820BA2C4B2E160B3A37`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 2 HDMV + 79 BD-J (79 "unsupported"); main title #41
@@ -598,6 +724,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 58. Heat — Director's Definitive Edition (Blu-ray)
 
 - **matrix256v0:** `89688ff5c1678f74c957c05f725c0e1da218bfc0811ac12034d47a52bb7fe7f2`
+- **matrix256v1:** `434000af52c57c30bcde66734a35f1058882ba3b2b65df961dd1933d1c1fd8e1`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `772F1358D1D5EFEC47D05C80E4AC19F94F06D9EF`
 - **Protection:** AACS ✓, BD+ ✓, BD-J ✓
 - **Titles:** 5 HDMV + 86 BD-J (86 "unsupported"); main title #67
@@ -609,6 +738,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 59. Heat — Director's Definitive Edition Bonus Features (Blu-ray)
 
 - **matrix256v0:** `da8189bd93e98ebee5fd48d446a1c7bca08b8a53d8e0c06d6b6c1b6aac72b886`
+- **matrix256v1:** `b62cc9414ccf6a1a4a0bc7019a7f1a5e833b573094fd123b73049d01b3503849`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `D843BBB357ED10278548030A5561A96640094772`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 5 HDMV + 86 BD-J (86 "unsupported"); main title #71
@@ -620,6 +752,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 60. Venom (Blu-ray)
 
 - **matrix256v0:** `30155044cfc76130769279d45bb7449a7a6bf09a60e1c77279b161b9c661521a`
+- **matrix256v1:** `7535ef82a812cf5b52dfd11884025a2267993d1b34d75436260d23e122f50c28`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `CE9F1725BA742084CE125EB949059150B870C2D3`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 16 HDMV + 4 BD-J (4 "unsupported"); main title #179
@@ -630,6 +765,9 @@ All digests below are matrix256v0 digests except where otherwise specified. Futu
 ## 61. Venom: Let There Be Carnage (Blu-ray)
 
 - **matrix256v0:** `18511045d48151227aa01aeea5b456d028c67bdabcff1edd72edaab3202bf2a9`
+- **matrix256v1:** `85582cedde959ba7fa0f124f3d298087078177cc4ebbbbb10c1cf66164782570`
+- **Filesystem view:** udf on /dev/sr0 (physical_disc); options `ro,nosuid,nodev,relatime,iocharset=utf8`
+- **Reader:** inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
 - **AACS Disc ID:** `7A5CA107FEAADF04CF1731DFBF42F39EC90954A1`
 - **Protection:** AACS ✓, BD+ ✗, BD-J ✓
 - **Titles:** 17 HDMV + 3 BD-J (3 "unsupported"); main title #94
