@@ -4,53 +4,50 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-**matrix256** — a specification family for reproducible SHA-256 fingerprints of optical discs and, more generally, of rooted filesystem trees. The deliverable is paper-length normative spec(s) that any language can implement to produce bit-identical digests for the same input. Audio CDs defer to MusicBrainz Disc ID and are not in scope for either matrix256 version.
+**matrix256** — a specification for reproducible SHA-256 fingerprints of rooted filesystem trees, with optical discs as the primary intended use case. The deliverable is a paper-length normative spec that any language can implement to produce bit-identical digests for the same input. Audio CDs have no filesystem and are out of scope; MusicBrainz Disc ID is the recommended complementary identifier for them.
 
-Two algorithm versions coexist in this repo:
-
-- **v0 (initial, frozen):** structural hash over a fixed list of named metadata files. DVD: `VIDEO_TS.IFO`, `VTS_NN_0.IFO`. Blu-ray: `index.bdmv`, `MovieObject.bdmv`, MPLS, CLPI. The normative spec is `README.md` and the reference implementation is `matrix256/v0.py`. v0 is under active evaluation against the real-disc corpus in `CORPUS.md`; published v0 digests must remain stable.
-- **v1 (draft, filesystem-agnostic):** walk the entire filesystem at the provided root and serialize `(path, size)` records. The normative spec is `SPEC.md`; the reference implementation is `matrix256/v1.py`. v1 has no published corpus digests yet, so the immutability rule does not bind until corpus entries land.
+The algorithm walks the entire filesystem at the provided root and serializes `(path, size)` records in a canonical form, hashed with SHA-256. The normative spec is `SPEC.md`; the reference implementation is `matrix256/v1.py`. The spec is labeled **matrix256v1**: there is no v0 in active service. An earlier `matrix256v0` algorithm was retired before publication; its corpus, code, and prose are gone from this tree (still recoverable from git history if ever needed).
 
 Companion (non-normative) documents:
 
-- `IMPLEMENTERS.md` — practical guidance for v1 implementers (bridge discs, encoding, mount handling).
+- `README.md` — project landing page: motivation, quickstart, links into the rest of the tree.
+- `IMPLEMENTERS.md` — practical guidance for implementers (bridge discs, encoding, mount handling).
 - `RATIONALE.md` — design rationale and prior-art comparison.
+- `CORPUS.md` — evaluation corpus of real discs and their published `matrix256v1` digests.
 - `VENUES.md` — candidate publication venues.
 - `PUBLICATION_TARGETS.md` — earlier journal scouting; partially superseded by `VENUES.md` but still in tree.
 
 The name doubles as the identifier's name, the library module, the CLI entry point, and the planned PyPI/npm/crates/brew slot (all verified free as of 2026-04-18). It's a reference to the *matrix number* etched into the metal disc-pressing stamper, with `256` pinning SHA-256.
 
-There is no build system or test suite. Alongside the specs, the repo carries a stdlib-only Python package (`matrix256/`, with each algorithm version as a submodule: `matrix256.v0`, `matrix256.v1`) and a CLI (`inspect_disc.py`) that shows which files a v0 fingerprint of a mounted disc would consume. A venv lives at `.venv/`; no external dependencies are required.
+There is no build system or test suite. Alongside the spec, the repo carries a stdlib-only Python package (`matrix256/`, with the algorithm in `matrix256.v1`) and a CLI (`inspect_disc.py`) that walks a mounted disc, surfaces metadata, and prints the matrix256v1 digest. A venv lives at `.venv/`; no external dependencies are required.
 
-The `matrix256.v0` submodule and the README v0 reference implementation are two expressions of the same normative v0 algorithm — if either changes, both must move together and produce byte-identical digests on the same input.
+The `matrix256.v1` submodule and the `SPEC.md` prose are two expressions of the same normative algorithm — if either changes, both must move together and produce byte-identical digests on the same input.
 
-## Load-bearing invariants (v0)
+## Load-bearing invariants
 
 When editing the spec or the reference implementation, these properties must hold — violating any of them breaks the whole point of the project:
 
-- **Determinism across implementations.** The digest must depend only on bytes on the disc and on choices fixed in the spec (file list, ordering, chunking is irrelevant to the hash). Never introduce anything that depends on the reader, OS, filesystem driver, locale, or library version. If a change could make two correct implementations disagree, it is wrong.
-- **Fixed file list and fixed order (v0).** DVD: `VIDEO_TS.IFO`, then `VTS_NN_0.IFO` for `NN` in `01..99` ascending. Blu-ray: `BDMV/index.bdmv`, `BDMV/MovieObject.bdmv`, then `BDMV/PLAYLIST/*.mpls` lexicographic, then `BDMV/CLIPINF/*.clpi` lexicographic. No separators, no length prefixes, no framing.
-- **Exclusions are intentional (v0).** `.BUP` files, `BDMV/BACKUP/*`, VOB/M2TS payload, `BDMV/STREAM`, `BDMV/AUXDATA`, `BDMV/BDJO`, `BDMV/JAR`, `BDMV/META` are deliberately excluded. Proposals to add them must either stay inside v0 with a compelling reason why they don't double-count or force whole-disc reads, or be factored out as a v1+ algorithm.
-- **Audio CD = MusicBrainz Disc ID, unchanged.** Do not propose an ARM-specific SHA-256 for audio CDs; the spec explicitly adopts MusicBrainz to avoid ecosystem fragmentation.
-- **No `format_version` field or other implementation-choice knobs.** A prior draft had one; it was removed because optional behavior destroys reproducibility. Future revisions are separate algorithms (e.g. `matrix256v1`), not parameters of v0.
-- **v0 digests are immutable.** Once a hash is in `CORPUS.md`, it must keep matching. Any change that would cause a previously-recorded corpus digest to differ is a v0 regression and should instead be scoped to a future version.
+- **Determinism across implementations.** The digest must depend only on the filesystem view exposed at the provided root and on choices fixed in the spec (path normalization, size source, sort order, serialization). Never introduce anything that depends on the reader, OS, filesystem driver, locale, or library version. If a change could make two correct implementations disagree on the same input view, it is wrong.
+- **Path normalization is fixed.** Forward slash separator, no leading slash, NFC, UTF-8 with U+FFFD substitution for invalid units. Sort order is byte-wise lexicographic over the UTF-8 encoded relative paths.
+- **Size comes from filesystem metadata, not from reading file contents.** Implementations must not seek through or read file bytes to verify size.
+- **Audio CDs out of scope.** Audio CDs have no filesystem and the spec applies to filesystem-rooted inputs. MusicBrainz Disc ID is the established community identifier.
+- **No `format_version` field or other implementation-choice knobs inside the digest.** Spec versions, when added, are separate algorithms (e.g. a hypothetical `matrix256v2`), not parameters of v1. The 64-character lowercase hex SHA-256 is the entire digest string.
+- **v1 digests are immutable.** Once a hash is in `CORPUS.md`, it must keep matching. Any change that would cause a previously-recorded corpus digest to differ is a v1 regression and should instead be scoped to a future version.
 
 ## Version labeling conventions
 
-- The version-bearing label is always `matrix256v0` / `matrix256v1` — no space between the family name and the version, in running prose and in structured contexts alike (database columns, API fields, file headers, table headers, bold field names). Bare `matrix256` is fine where the version is unambiguous from context (e.g. inside `README.md` or `CORPUS.md` after the introduction has established scope).
-- A separate `version: 0` / `version: 1` field is acceptable as an alternative when the carrier already names matrix256 elsewhere.
-- In the v0 reference implementation: `matrix256.v0.VERSION = "0"`.
+- The version-bearing label is `matrix256v1` — no space between the family name and the version, in running prose and in structured contexts alike (database columns, API fields, file headers, table headers, bold field names). Bare `matrix256` is fine where the version is unambiguous from context (e.g. inside `SPEC.md` or `CORPUS.md` after the introduction has established scope).
+- A separate `version: 1` field is acceptable as an alternative when the carrier already names matrix256 elsewhere.
+- In the reference implementation: `matrix256.v1.VERSION = "1"`.
 - Never embed the version in the digest string itself — the digest is a 64-character lowercase hex SHA-256, nothing else.
 
 ## Editing guidance
 
-- The v0 normative spec is `README.md`; the v1 normative spec is `SPEC.md`. Keep them clearly separated: don't blur v0 prose with v1 framing or vice versa.
-- v0 has two synchronized expressions: the prose+code in `README.md` and the submodule `matrix256/v0.py`. If file-selection or ordering logic changes in one, update the other and verify they still produce byte-identical digests on the corpus.
-- v1 has the same prose+code synchronization rule: `SPEC.md` and `matrix256/v1.py` must agree. Any v1 digests, once recorded against a corpus, are immutable from that moment on.
-- When revising v0 prose, keep the DVD/Blu-ray/audio-CD sections symmetric (collect → sort → concatenate → SHA-256) — the paper's readability depends on that parallelism. v1 is filesystem-agnostic, so the parallelism rule does not apply there.
-- Filenames in DVD-Video are uppercase; UDF is case-insensitive but case-sensitive views must select uppercase. Don't "fix" this to be case-insensitive in v0 reference code.
-- Argumentative content belongs in `RATIONALE.md`; practical implementer concerns (mounting, encoding, bridge-disc resolution) belong in `IMPLEMENTERS.md`. Both are non-normative and must not contradict the specs they accompany.
-- If a proposed change would alter an existing v0 corpus digest, it is by definition a v1+ change, not a v0 revision. Open a design doc for the new version; leave v0 frozen. The same rule applies once v1 digests are published.
+- The normative spec is `SPEC.md`; `README.md` is a friendly landing page and must not contradict the spec. If `SPEC.md` and `README.md` disagree, `SPEC.md` wins and `README.md` is the bug.
+- The spec and the submodule must agree: `SPEC.md` and `matrix256/v1.py` must produce byte-identical digests on the same input. If walk/sort/serialization logic changes in one, update the other and verify against `CORPUS.md`.
+- Argumentative content belongs in `RATIONALE.md`; practical implementer concerns (mounting, encoding, bridge-disc resolution) belong in `IMPLEMENTERS.md`. Both are non-normative and must not contradict `SPEC.md`.
+- If a proposed change would alter an existing v1 corpus digest, it is by definition a v2+ change, not a v1 revision. Open a design doc for the new version; leave v1 frozen.
+- v0 is retired. Do not reintroduce v0 prose, code, or corpus columns. If a historical v0 digest is needed (e.g. for cross-referencing a third-party catalog), recover it from git history rather than re-adding columns to the active corpus.
 
 ## Unrelated files
 

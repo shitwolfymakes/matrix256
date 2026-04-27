@@ -1,191 +1,104 @@
 # matrix256: Reproducible Fingerprints for Optical Discs
 
-**Version:** 0 (initial, pre-stable)
-
-**matrix256** is a reproducible SHA-256 fingerprint for optical discs (DVD-Video, Blu-ray) computed from disc-native bytes only. Given the same disc, any correct implementation of this specification produces the same digest, regardless of operating system, reader hardware, or language runtime. For audio CDs, matrix256 defers to the existing MusicBrainz Disc ID unchanged.
+**matrix256** is a reproducible SHA-256 fingerprint for optical discs and, more generally, for rooted filesystem trees. Given the same disc and the same filesystem view, any correct implementation produces a bit-identical digest regardless of operating system, reader hardware, or language runtime.
 
 The name is an homage to the *matrix number* — the identifier etched into the metal stamper that presses every disc — with the `256` suffix pinning the hash function.
 
-This document describes **matrix256v0**: the initial specification, released for community review. The algorithm described here — structural hashing of named metadata files (IFO, index.bdmv, MPLS, CLPI) — is being evaluated against a real-disc corpus. Future revisions may change the input selection rule (for example, to a full filesystem-tree hash); any such revision will be published as a distinct algorithm version (v1, v2, ...) with its own digest, not as a modification of v0. Digests produced against this specification are stable regardless of future versions.
+The current and only active version of the algorithm is **matrix256v1**. The normative specification is [`SPEC.md`](SPEC.md); the reference implementation is [`matrix256/v1.py`](matrix256/v1.py).
 
 ## Motivation
 
 Metadata lookup services (TMDB, OMDB) key on titles and years entered by humans, which are lossy, language-specific, and ambiguous (region variants, extended editions, double-dips). Existing disc-level identifiers address parts of this:
 
 - **MusicBrainz Disc ID** — SHA-1 of a normalized audio-CD TOC. A community standard for audio CDs.
-- **pydvdid** — a CRC64 over DVD track layout. Fingerprint of the TOC structure, not of disc bytes. CRC64 has a small collision space; different pressings with identical track layouts collide.
-- **VIDEO_TS / BDMV content hashes** — no widely-adopted standard exists.
+- **pydvdid** — a CRC64 over DVD track layout. CRC64 has a small collision space; different pressings with identical track layouts collide.
+- **AACS Disc ID / BD-J organization ID** — assigned identifiers stored on some Blu-ray discs. Identify a licensing or authoring group, not a specific structural encoding, and may be absent on homemade or open-content discs.
 
-This specification defines a uniform SHA-256 fingerprint over disc-native metadata bytes for DVD-Video and Blu-ray discs, and pins the existing MusicBrainz Disc ID for audio CDs. The goal is a stable, reproducible identifier that:
+matrix256 defines a uniform SHA-256 fingerprint over a disc's filesystem layout — every regular file's path and size, canonically serialized — and produces the same digest for any standards-compliant filesystem view of that disc. The goal is a stable, reproducible identifier that:
 
-- Is computed from bytes the disc itself carries, so the same disc always hashes to the same digest.
+- Is computed from filesystem metadata the disc itself carries, so the same disc always hashes to the same digest under the same view.
 - Depends on no implementation choices that could change over time.
 - Permits a many-to-one mapping from fingerprints to logical titles. Region variants, language variants, and special editions of the same title are expected to produce different fingerprints. That is a feature, not a bug: a community mapping layer resolves fingerprints to titles.
 
-## Goals and non-goals
+## Scope and non-goals
 
-**Goals**
+matrix256 applies to any optical disc that exposes a readable filesystem (DVD-Video, DVD-ROM, HD DVD, Blu-ray, UHD Blu-ray, Video CD, data discs, combo-pack supplementary discs) and to any rooted filesystem tree more generally. **Audio CDs** carry no filesystem and are out of scope; MusicBrainz Disc ID is the recommended companion identifier for catalogs that handle both.
 
-- **Reproducibility.** A correct implementation in any language produces bit-identical digests for the same disc.
-- **Disc-only input.** The fingerprint is a function of bytes on the disc; it does not depend on the reader, the host OS, the filesystem driver, or the implementing software version.
-- **Structural identity, not content identity.** The fingerprint covers metadata structures (IFO, MPLS, CLPI, index.bdmv, MovieObject.bdmv), not the video payload itself. Hashing the full video payload is outside scope.
-- **Publishable spec.** The algorithm is small enough to fit on one page and be reimplemented in an afternoon.
+Non-goals: tamper detection, per-byte content verification, robustness to disc damage, copy-protection bypass. matrix256 hashes filesystem metadata, not file contents — two discs with identical filesystem layouts but different bit-level video encodings produce the same fingerprint. In practice, mastering changes are almost always accompanied by structural changes, but the collision is possible and should be understood.
 
-**Non-goals**
+## Quickstart
 
-- Tamper detection. This fingerprint is not a cryptographic proof of disc contents; it is an identifier.
-- Per-frame or per-byte content verification.
-- Robustness to disc damage. A disc with unreadable sectors in a metadata file will not produce a meaningful fingerprint.
-- Copy-protection bypass. The algorithm reads only unencrypted metadata structures that any standards-compliant reader can access.
-
-## Algorithm
-
-The fingerprint is the lowercase hex encoding of the SHA-256 digest of a byte stream assembled from specific files on the mounted disc, concatenated in a specified order with no separators.
-
-### DVD-Video
-
-Input: a DVD-Video disc with a readable `VIDEO_TS` directory.
-
-1. Collect the following files from the `VIDEO_TS` directory, if present:
-   - `VIDEO_TS.IFO`
-   - `VTS_NN_0.IFO` for each title set, where `NN` ranges from `01` to `99`.
-2. Sort the collected files in this exact order:
-   - `VIDEO_TS.IFO` first.
-   - Then `VTS_NN_0.IFO` in ascending numeric order of `NN`.
-3. Concatenate the raw bytes of each file into a single byte stream. No separators, no framing, no length prefixes.
-4. Compute the SHA-256 of the concatenated stream.
-
-Files that do not exist on the disc are skipped. `.BUP` backup files are **not** included; they duplicate the IFO bytes and their inclusion would double-count identical content. VOB video payload files are **not** included; this is a structural fingerprint.
-
-Filenames in the DVD-Video specification are uppercase. UDF is case-insensitive, but implementations that read the filesystem via a case-sensitive view must select uppercase filenames.
-
-### Blu-ray
-
-Input: a Blu-ray disc with a readable `BDMV` directory.
-
-1. Collect the following files, if present:
-   - `BDMV/index.bdmv`
-   - `BDMV/MovieObject.bdmv`
-   - All `BDMV/PLAYLIST/*.mpls`
-   - All `BDMV/CLIPINF/*.clpi`
-2. Sort in this exact order:
-   - `BDMV/index.bdmv` first.
-   - Then `BDMV/MovieObject.bdmv`.
-   - Then every `.mpls` file in `BDMV/PLAYLIST`, lexicographically by filename.
-   - Then every `.clpi` file in `BDMV/CLIPINF`, lexicographically by filename.
-3. Concatenate the raw bytes of each file. No separators.
-4. Compute the SHA-256 of the concatenated stream.
-
-Blu-ray playlist and clip info files are zero-padded numeric filenames (`00000.mpls`, `00001.mpls`, …), so lexicographic ordering is equivalent to numeric ordering. No files from `BDMV/STREAM`, `BDMV/AUXDATA`, `BDMV/BDJO`, `BDMV/JAR`, or `BDMV/META` are included. Files in `BDMV/BACKUP` are not included; like DVD `.BUP` files, they duplicate primary data. The disc-root `CERTIFICATE/` directory — which holds the BD-J security root (publisher/disc ID in `id.bdmv`, X.509 root certificates for signing BD-J applications and Bonus View content, and BD-Live network credentials in `online.*`) — sits outside `BDMV/` and is therefore outside the fingerprint input set.
-
-### Audio CD
-
-Input: a Red Book audio CD.
-
-The fingerprint **is** the MusicBrainz Disc ID, computed per the [MusicBrainz Disc ID Calculation specification](https://musicbrainz.org/doc/Disc_ID_Calculation). No ARM-specific hash is computed for audio CDs.
-
-Rationale: audio CDs have no metadata files to hash. The MusicBrainz Disc ID is a SHA-1 of a canonical TOC layout, is already published as a community standard, and is already the key used by the largest community database for audio CDs. Introducing a parallel SHA-256 would fragment the ecosystem with no gain.
-
-### Data discs and other optical media
-
-Out of scope. Data discs carry arbitrary filesystem content and have no fixed metadata structure to fingerprint. Applications wishing to identify data discs can compute file-level hashes using conventional tools.
-
-## Reference implementation (Python)
-
-```python
-import hashlib
-from pathlib import Path
-
-
-def dvd_fingerprint(mountpoint: Path) -> str:
-    video_ts = mountpoint / "VIDEO_TS"
-    files = []
-    vmg = video_ts / "VIDEO_TS.IFO"
-    if vmg.is_file():
-        files.append(vmg)
-    for nn in range(1, 100):
-        vts = video_ts / f"VTS_{nn:02d}_0.IFO"
-        if vts.is_file():
-            files.append(vts)
-    h = hashlib.sha256()
-    for path in files:
-        with path.open("rb") as f:
-            for chunk in iter(lambda: f.read(1 << 16), b""):
-                h.update(chunk)
-    return h.hexdigest()
-
-
-def bluray_fingerprint(mountpoint: Path) -> str:
-    bdmv = mountpoint / "BDMV"
-    files = []
-    for name in ("index.bdmv", "MovieObject.bdmv"):
-        p = bdmv / name
-        if p.is_file():
-            files.append(p)
-    files.extend(sorted((bdmv / "PLAYLIST").glob("*.mpls")))
-    files.extend(sorted((bdmv / "CLIPINF").glob("*.clpi")))
-    h = hashlib.sha256()
-    for path in files:
-        with path.open("rb") as f:
-            for chunk in iter(lambda: f.read(1 << 16), b""):
-                h.update(chunk)
-    return h.hexdigest()
-```
-
-For audio CDs, use any conforming implementation of MusicBrainz Disc ID (`libdiscid`, `python-discid`, or equivalent) and store the returned identifier verbatim.
-
-## Rationale
-
-**Why SHA-256.** SHA-256 is cryptographically sound, universally available in standard libraries, and produces a 256-bit digest with no realistic collision risk for any scale of disc catalog. CRC64 (as used by `pydvdid`) has a 64-bit space that is adequate for small catalogs but inappropriate for a community identifier. MD5 and SHA-1 are omitted; they carry collision risk with no offsetting benefit here.
-
-**Why these files and not others.** The chosen files are the structural, disc-mastered metadata that define the playback experience: program chains, cell tables, stream attributes, region flags, playlist definitions, clip descriptors. They are small (a few hundred kilobytes total), present on every standards-compliant disc, and stable across playback software. Video payload files (VOB, M2TS) are deliberately excluded: they are large, their presence or absence in a hash would force implementations to read the entire disc, and their bit-level identity is captured indirectly through the structural metadata that references them.
-
-**Why exclude backup files.** `VIDEO_TS.BUP`, `VTS_NN_0.BUP`, and `BDMV/BACKUP/*` are duplicates of the primary metadata files. Including them in the hash would double-count identical bytes and add nothing to the identifier's specificity.
-
-**Why exclude format versioning.** An earlier draft of this specification included a `format_version` field alongside the digest so that the algorithm could be updated later without invalidating existing hashes. That field was removed: if the hash ever depends on implementation choices, the reproducibility property is lost. The file list and ordering are fixed for this version (v0) of the specification. Future revisions, if needed, will be defined as separate algorithms (e.g., a hypothetical `matrix256/1`) and published alongside this one, not as a modification of it. Implementations that need to disambiguate between specification versions should do so at the application or protocol layer (database column, API response field), not within the digest string itself.
-
-**Why many fingerprints per title is expected.** A theatrical release, a region A Blu-ray, a region B Blu-ray, a director's cut, and a special edition of the same film will typically each produce a distinct fingerprint. This is the intended behavior: the fingerprint identifies a specific disc edition, not an abstract title. The mapping from fingerprint to title is a separate, mutable, community-curated layer.
-
-## Limitations
-
-- **Disc damage.** Unreadable sectors inside a metadata file will either cause the read to fail or produce a digest over corrupted bytes. Implementations should fail loudly rather than silently emit a digest from partial data.
-- **Non-standard discs.** Some homemade or non-commercial discs omit `MovieObject.bdmv`, include unusual file layouts, or use non-standard filename conventions. The algorithm produces a deterministic digest for any input that matches the shape defined here; discs that do not match this shape will produce digests that cannot be meaningfully compared to commercial disc fingerprints.
-- **UHD Blu-ray.** This specification covers Blu-ray (BDMV) as commonly authored. UHD Blu-ray layouts are a superset; the algorithm as specified covers the files that exist in both formats and should produce stable digests for UHD discs, but formal coverage is pending verification against a range of UHD titles.
-- **Not a content hash.** Two discs with identical metadata but different video encodings (different mastering passes of the same structural layout) would produce the same fingerprint. In practice this collision is rare because mastering changes are almost always accompanied by structural changes, but it is possible and should be understood.
-- **Box sets and TV series.** Sibling discs in a TV-series box set often share title counts and generic per-title names (e.g. unnamed or numeric-only titles). The hashed metadata (IFO for DVD; index/MovieObject/MPLS/CLPI for Blu-ray) encodes per-disc sector offsets, chapter timings, and durations, so sibling discs are expected to produce distinct digests; empirical verification against a range of multi-disc box sets is pending.
-
-## Prior art and related identifiers
-
-- **MusicBrainz Disc ID** ([spec](https://musicbrainz.org/doc/Disc_ID_Calculation)) — SHA-1 of a normalized audio-CD TOC. This specification adopts it unchanged for audio CDs.
-- **pydvdid** ([project](https://github.com/sjwood/pydvdid)) — CRC64 of DVD track layout derived from `VIDEO_TS.IFO`. Demonstrates the utility of a structural hash but uses a hash function with too small a collision space for a community-wide identifier.
-- **Blu-ray on-disc identifiers** — libbluray surfaces two disc IDs via `bd_info`: an AACS-derived `Disc ID` (20 bytes, obtained through libaacs from the disc's AACS material; only populated when an `AACS/` directory is present and libaacs is loaded) and a BD-J organization/disc ID pair parsed from `CERTIFICATE/id.bdmv` when the producer authored that file. Both are assigned identifiers — cryptographic or manually authored — rather than hashes of disc contents, and both may be absent on homemade or open-content discs. They identify a licensing or authoring group, not a specific structural encoding, which is the property matrix256 provides.
-- **libdvdread / libbluray** — the canonical open-source libraries for parsing DVD and Blu-ray metadata. Either can be used to implement the file reads in this specification, though direct filesystem access is sufficient.
-
-## Repository tooling
-
-Alongside the specification, this repository carries two small Python files that depend only on the standard library:
-
-- `matrix256/v0.py` — the reference implementation above, factored into a reusable submodule of the `matrix256` package. The file-selection and hashing logic is byte-for-byte equivalent to the code block in [Reference implementation](#reference-implementation-python); either can be used to verify a third-party implementation. Importing code addresses it as `from matrix256.v0 import ...`.
-- `inspect_disc.py` — a command-line tool that reports, for a mounted disc, which files would be fed into the fingerprint (in spec order, with sizes), which files are present but excluded (with the reason), and the resulting matrix256 digest. Intended for sanity-checking implementations and for surveying real discs.
-
-Example:
+Clone the repository and inspect a mounted disc, an ISO image, or a block device:
 
 ```
-$ python inspect_disc.py /media/user/MY_DISC
+$ python inspect_disc.py /dev/sr0
+Source:    /dev/sr0
 Mount:     /media/user/MY_DISC
 Disc type: bluray
 
-Files included in fingerprint (6 files, 1.2 MB):
-    1. BDMV/index.bdmv               92 B
-    2. BDMV/MovieObject.bdmv        256 B
-    3. BDMV/PLAYLIST/00000.mpls   1.4 KB
-    ...
+Fingerprint (matrix256v1, SHA-256): 652e8189d14d260ea73e0e8e08848a455139e110b0655c56dd0cf42886f1499d
 
-Fingerprint (matrix256v0, SHA-256): 647f526d79439f2cc13b0516ebed57a18dc0a6ceb8d985db99b7a52748375cd4
+Submission metadata (filesystem view):
+  Source kind:    physical_disc
+  Filesystem:     udf
+  Mount device:   /dev/sr0
+  Mount options:  ro,nosuid,nodev,relatime,iocharset=utf8
+  Reader:         inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
+
+Metadata (libbluray):
+  Disc name:      BIG_BUCK_BUNNY
+  ...
 ```
 
-Flags: `--no-fingerprint` to skip hashing (selection only), `--json` for machine-readable output. Audio CDs are out of scope for this tool; use a MusicBrainz Disc ID implementation (`libdiscid`, `python-discid`, or equivalent).
+`inspect_disc.py` accepts a mount-point directory, an ISO file (loop-mounted via `udisksctl`), or a block device (e.g. `/dev/sr0`). Anything it mounts itself, it unmounts on exit. Flags: `--no-fingerprint` to skip hashing, `--no-metadata` to skip the lsdvd / bd_info / makemkv summary, `--json` for a machine-readable report.
+
+For audio CDs, use a MusicBrainz Disc ID implementation (`libdiscid`, `python-discid`, or equivalent).
+
+## Reference implementation (Python)
+
+The full reference implementation is in [`matrix256/v1.py`](matrix256/v1.py). The core is small:
+
+```python
+import hashlib
+import unicodedata
+from pathlib import Path
+
+
+def fingerprint(root: Path) -> str:
+    records = []
+    for p in root.rglob("*"):
+        if not p.is_file() or p.is_symlink():
+            continue
+        rel = p.relative_to(root).as_posix()
+        rel_nfc = unicodedata.normalize("NFC", rel)
+        records.append((rel_nfc.encode("utf-8"), p.stat().st_size))
+    records.sort(key=lambda r: r[0])
+    h = hashlib.sha256()
+    for path_bytes, size in records:
+        h.update(path_bytes)
+        h.update(b"\x00")
+        h.update(str(size).encode("ascii"))
+        h.update(b"\n")
+    return h.hexdigest()
+```
+
+The actual module handles symlinks, non-Unicode bytes, and error reporting per the spec — see `matrix256/v1.py` and [`SPEC.md`](SPEC.md) for the normative behavior.
+
+## Documents in this repository
+
+- [`SPEC.md`](SPEC.md) — **normative specification.** This is the source of truth.
+- [`RATIONALE.md`](RATIONALE.md) — design rationale, prior-art comparison, why-not-X.
+- [`IMPLEMENTERS.md`](IMPLEMENTERS.md) — practical guidance for implementers (bridge discs, encoding, mount handling, submission metadata).
+- [`CORPUS.md`](CORPUS.md) — evaluation corpus of real discs with published `matrix256v1` digests.
+- [`VENUES.md`](VENUES.md) — candidate publication venues for the spec.
+
+## Repository tooling
+
+The repo carries two stdlib-only Python files:
+
+- [`matrix256/v1.py`](matrix256/v1.py) — the reference implementation, factored into a reusable submodule. Importing code addresses it as `from matrix256 import v1`.
+- [`inspect_disc.py`](inspect_disc.py) — a CLI that mounts a disc (if needed), computes the matrix256v1 digest, and renders a MakeMKV-style metadata summary alongside the IMPLEMENTERS.md §5 submission view (source kind, filesystem driver, mount options, reader info). Useful for verifying spec compliance on real discs and for building an evaluation corpus.
 
 ## License
 
-TBD. The specification and reference implementation will be released under a permissive open-source license once the first-version spec is frozen.
+TBD. The specification and reference implementation will be released under a permissive open-source license once the spec is frozen.

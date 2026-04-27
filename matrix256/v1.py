@@ -1,12 +1,9 @@
 """matrix256v1 — reference implementation of the filesystem-walk fingerprint.
 
 Every regular file under the walk root contributes one (relative-path,
-size) record to a SHA-256 hash. The resulting digest is a matrix256v1
-digest; it lives in a distinct digest space from matrix256v0 over the
-same media.
-
-The walk and serialization logic here must stay in lockstep with the
-normative spec in SPEC.md. If one changes, the other must too.
+size) record to a SHA-256 hash. The walk and serialization logic here
+must stay in lockstep with the normative spec in SPEC.md. If one
+changes, the other must too.
 """
 
 from __future__ import annotations

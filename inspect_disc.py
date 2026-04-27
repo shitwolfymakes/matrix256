@@ -1,4 +1,4 @@
-"""Inspect an optical disc and show what the matrix256 fingerprints cover.
+"""Inspect an optical disc and compute its matrix256v1 fingerprint.
 
 Usage:
     python inspect_disc.py <path> [--no-fingerprint] [--no-metadata] [--json]
@@ -8,11 +8,11 @@ file, or a block device (e.g. /dev/sr0). ISO images are loop-mounted read-only
 via udisksctl; block devices are mounted via udisksctl if not already mounted
 by the desktop. Either way, anything the script mounted is unmounted on exit.
 
-Computes both matrix256v0 (structural hash over a fixed list of disc-native
-metadata files) and matrix256v1 (filesystem-walk hash over (path, size)
-records). Shows disc type, the v0 input set in spec order, files present but
-excluded from the v0 set (with the reason), and a MakeMKV-style metadata
-summary (titles, durations, chapters, streams). Metadata extraction uses
+Computes the matrix256v1 digest (filesystem-walk hash over (path, size)
+records) and reports the IMPLEMENTERS.md §5 submission view: source kind,
+filesystem driver, mount options, and reader info. Also surfaces a
+MakeMKV-style metadata summary (titles, durations, chapters, streams) when
+the disc carries DVD-Video or BDMV structure. Metadata extraction uses
 lsdvd for DVDs and libbluray's bd_info/bd_list_titles for Blu-rays; install
 `lsdvd` and `libbluray-bin` to enable. Useful for verifying spec compliance
 on real discs and for building an evaluation corpus.
@@ -36,27 +36,18 @@ from xml.dom import minidom
 from xml.parsers.expat import ExpatError
 
 from matrix256 import v1
-from matrix256.v0 import (
-    SelectionEntry,
-    detect_disc_type,
-    hash_files,
-    select_bluray_files,
-    select_dvd_files,
-)
 
-DVD_EXCLUSION_REASONS = {
-    ".BUP": "backup file — duplicates primary IFO bytes",
-    ".VOB": "video payload — structural hash only",
-}
 
-BLURAY_EXCLUSION_DIRS = {
-    "STREAM": "video payload (M2TS) — structural hash only",
-    "AUXDATA": "auxiliary data — excluded by spec",
-    "BDJO": "BD-J objects — excluded by spec",
-    "JAR": "BD-J jars — excluded by spec",
-    "META": "metadata directory — excluded by spec",
-    "BACKUP": "backup directory — duplicates primary files",
-}
+def detect_disc_type(mountpoint: Path) -> str:
+    """Classify the mount as DVD-Video, Blu-ray, or unknown — used only to
+    route the metadata-extraction step (lsdvd vs bd_info). The matrix256v1
+    fingerprint walks the whole filesystem regardless and does not depend
+    on this classification."""
+    if (mountpoint / "VIDEO_TS").is_dir():
+        return "dvd"
+    if (mountpoint / "BDMV").is_dir():
+        return "bluray"
+    return "unknown"
 
 
 class IsoMountError(RuntimeError):
@@ -574,34 +565,6 @@ def _fmt_size(n: int) -> str:
     return f"{n/1024/1024/1024:.2f} GB"
 
 
-def find_dvd_exclusions(mountpoint: Path) -> list[tuple[str, int, str]]:
-    video_ts = mountpoint / "VIDEO_TS"
-    if not video_ts.is_dir():
-        return []
-    excluded: list[tuple[str, int, str]] = []
-    for p in sorted(video_ts.iterdir()):
-        if not p.is_file():
-            continue
-        suffix = p.suffix.upper()
-        if suffix == ".IFO" and (p.name == "VIDEO_TS.IFO" or p.name.endswith("_0.IFO")):
-            continue
-        reason = DVD_EXCLUSION_REASONS.get(suffix, "not part of fingerprint input set")
-        excluded.append((f"VIDEO_TS/{p.name}", p.stat().st_size, reason))
-    return excluded
-
-
-def find_bluray_exclusions(mountpoint: Path) -> list[tuple[str, int, str]]:
-    bdmv = mountpoint / "BDMV"
-    if not bdmv.is_dir():
-        return []
-    excluded: list[tuple[str, int, str]] = []
-    for child in sorted(bdmv.iterdir()):
-        if child.is_dir() and child.name in BLURAY_EXCLUSION_DIRS:
-            total = sum(p.stat().st_size for p in child.rglob("*") if p.is_file())
-            excluded.append((f"BDMV/{child.name}/", total, BLURAY_EXCLUSION_DIRS[child.name]))
-    return excluded
-
-
 def _fmt_hms(seconds: float) -> str:
     total = int(round(seconds))
     h, r = divmod(total, 3600)
@@ -792,9 +755,7 @@ def render_text(
     source: Path,
     mount: Path,
     disc_type: str,
-    included: list[SelectionEntry],
-    excluded: list[tuple[str, int, str]],
-    fingerprints: dict[str, str | None],
+    fingerprint: str | None,
     metadata: dict | None = None,
     show_metadata: bool = True,
     disc_library_xml: dict | None = None,
@@ -808,36 +769,10 @@ def render_text(
     lines.append(f"Disc type: {disc_type}")
     lines.append("")
 
-    if included:
-        total = sum(e.path.stat().st_size for e in included)
-        lines.append(f"Files included in matrix256v0 fingerprint ({len(included)} files, {_fmt_size(total)}):")
-        width = max(len(e.relative) for e in included)
-        for i, e in enumerate(included, 1):
-            size = e.path.stat().st_size
-            lines.append(f"  {i:>3}. {e.relative:<{width}}  {_fmt_size(size):>10}")
-        lines.append("")
+    if fingerprint is None:
+        lines.append("Fingerprint: not computed (--no-fingerprint)")
     else:
-        lines.append("No matrix256v0 input files found.")
-        if disc_type == "unknown":
-            lines.append("This path does not contain a VIDEO_TS or BDMV directory.")
-            lines.append("Audio CDs are not inspectable from a filesystem path; use a MusicBrainz Disc ID tool (libdiscid / python-discid).")
-        lines.append("")
-
-    if excluded:
-        lines.append(f"Files present but excluded from matrix256v0 ({len(excluded)}):")
-        ex_width = max(len(name) for name, _, _ in excluded)
-        for name, size, reason in excluded:
-            lines.append(f"       {name:<{ex_width}}  {_fmt_size(size):>10}  ({reason})")
-        lines.append("")
-
-    fp_v0 = fingerprints.get("v0")
-    fp_v1 = fingerprints.get("v1")
-    if fp_v0 is None and fp_v1 is None:
-        lines.append("Fingerprints: not computed (--no-fingerprint)")
-    else:
-        lines.append("Fingerprints (SHA-256):")
-        lines.append(f"  matrix256v0: {fp_v0 if fp_v0 is not None else 'n/a (no input files)'}")
-        lines.append(f"  matrix256v1: {fp_v1 if fp_v1 is not None else 'n/a'}")
+        lines.append(f"Fingerprint (matrix256v1, SHA-256): {fingerprint}")
 
     sub_lines = render_submission(submission or {})
     if sub_lines:
@@ -862,18 +797,7 @@ def render_text(
 
 def build_report(source: Path, mount: Path, compute: bool, include_metadata: bool = True) -> dict:
     disc_type = detect_disc_type(mount)
-    if disc_type == "dvd":
-        included = select_dvd_files(mount)
-        excluded = find_dvd_exclusions(mount)
-    elif disc_type == "bluray":
-        included = select_bluray_files(mount)
-        excluded = find_bluray_exclusions(mount)
-    else:
-        included = []
-        excluded = []
-
-    fingerprint_v0 = hash_files(included) if compute and included else None
-    fingerprint_v1 = v1.fingerprint(mount) if compute else None
+    fingerprint = v1.fingerprint(mount) if compute else None
     metadata = _extract_metadata(disc_type, mount) if include_metadata else None
     disc_library_xml = _read_disc_library_xml(disc_type, mount) if include_metadata else None
     metadata_makemkv = _extract_makemkv_metadata(source, mount) if include_metadata else None
@@ -883,17 +807,7 @@ def build_report(source: Path, mount: Path, compute: bool, include_metadata: boo
         "source": str(source),
         "mount": str(mount),
         "disc_type": disc_type,
-        "included": [
-            {"path": e.relative, "size": e.path.stat().st_size} for e in included
-        ],
-        "excluded": [
-            {"path": name, "size": size, "reason": reason}
-            for name, size, reason in excluded
-        ],
-        "fingerprints": {
-            "v0": fingerprint_v0,
-            "v1": fingerprint_v1,
-        },
+        "fingerprint": fingerprint,
         "submission": submission,
         "metadata": metadata,
         "metadata_makemkv": metadata_makemkv,
@@ -906,14 +820,8 @@ def _inspect(source: Path, mount: Path, *, compute: bool, metadata: bool, as_jso
     if as_json:
         print(json.dumps(report, indent=2))
         return
-    included = [
-        SelectionEntry(mount / entry["path"], entry["path"])
-        for entry in report["included"]
-    ]
-    excluded = [(e["path"], e["size"], e["reason"]) for e in report["excluded"]]
     print(render_text(
-        source, mount, report["disc_type"], included, excluded,
-        report["fingerprints"], report.get("metadata"),
+        source, mount, report["disc_type"], report["fingerprint"], report.get("metadata"),
         show_metadata=metadata,
         disc_library_xml=report.get("disc_library_xml"),
         metadata_makemkv=report.get("metadata_makemkv"),
@@ -922,9 +830,9 @@ def _inspect(source: Path, mount: Path, *, compute: bool, metadata: bool, as_jso
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Inspect what the matrix256v0 and matrix256v1 fingerprints cover on a mounted optical disc or ISO image.")
+    parser = argparse.ArgumentParser(description="Compute the matrix256v1 fingerprint of a mounted optical disc, ISO image, or block device, and surface IMPLEMENTERS.md §5 submission metadata.")
     parser.add_argument("path", type=Path, help="Mounted disc directory (e.g. /media/user/DISC), ISO file (.iso), or block device (e.g. /dev/sr0)")
-    parser.add_argument("--no-fingerprint", action="store_true", help="Skip SHA-256 computation (selection only)")
+    parser.add_argument("--no-fingerprint", action="store_true", help="Skip SHA-256 computation; report metadata and submission view only")
     parser.add_argument("--no-metadata", action="store_true", help="Skip title/stream metadata extraction (lsdvd / bd_info)")
     parser.add_argument("--json", action="store_true", help="Emit a machine-readable JSON report instead of text")
     args = parser.parse_args(argv)

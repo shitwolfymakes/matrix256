@@ -1,7 +1,6 @@
 # matrix256 Specification
 
 **Version:** 1
-**Status:** Draft
 
 matrix256 is a reproducible cryptographic fingerprint for optical discs. Given the same disc, any correct implementation of this specification produces a bit-identical SHA-256 digest regardless of operating system, reader, optical drive, or language runtime.
 

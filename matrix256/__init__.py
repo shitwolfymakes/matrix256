@@ -1,14 +1,15 @@
 """matrix256 — reproducible fingerprints for optical discs and filesystem trees.
 
-Each matrix256 algorithm version is a separate submodule:
+The active algorithm version lives in ``matrix256.v1``: a SHA-256 over a
+canonical serialization of the (path, size) records of every regular file
+under the walk root. See ``SPEC.md`` for the normative specification.
 
-- ``matrix256.v0`` — structural hash over a fixed list of named metadata files
-  (DVD: ``VIDEO_TS.IFO``, ``VTS_NN_0.IFO``; Blu-ray: ``index.bdmv``,
-  ``MovieObject.bdmv``, MPLS, CLPI). See ``README.md``.
-- ``matrix256.v1`` — filesystem-walk hash over (path, size) records. See
-  ``SPEC.md``.
+Importing code addresses the algorithm explicitly:
 
-Versions produce independent digest spaces; importing code must select a
-version explicitly (e.g. ``from matrix256.v0 import select_dvd_files``). The
-package itself exposes nothing — there is no implicit "current" version.
+    from matrix256 import v1
+    digest = v1.fingerprint(mountpoint)
+
+The package exposes nothing at the top level so future versions can be
+added as sibling submodules (``matrix256.v2``, …) without a "current"
+default that would silently change behavior.
 """
