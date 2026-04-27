@@ -24,14 +24,10 @@ import argparse
 import ast
 import contextlib
 import csv
-import ctypes
-import ctypes.util
 import json
-import os
 import platform
 import re
 import shutil
-import signal
 import subprocess
 import sys
 import time
@@ -191,103 +187,20 @@ def mount_block_device(device: Path):
             print(f"warning: failed to unmount {device_str}: {(result.stderr or result.stdout).strip()}", file=sys.stderr)
 
 
-_PR_SET_CHILD_SUBREAPER = 36
-
-
-def _set_child_subreaper() -> None:
-    """Mark this process as a child subreaper (Linux ≥ 3.4).
-
-    Normally a daemon-style child that double-forks via `setsid()` re-parents
-    itself to init/systemd and disappears from our process tree entirely.
-    `makemkvcon`'s `guiserver` child does exactly that: it slips out of the
-    `start_new_session=True` group we put `makemkvcon` in, and by the time we
-    walk `/proc` looking for descendants on a timeout, it's gone. With the
-    child-subreaper flag set, the kernel re-parents orphaned descendants to
-    *us* instead of to init, so the /proc walk picks them up and we can kill
-    them. Best-effort: silent no-op on non-Linux or if libc isn't reachable.
-    """
-    try:
-        libc = ctypes.CDLL(ctypes.util.find_library("c") or "libc.so.6", use_errno=True)
-    except OSError:
-        return
-    libc.prctl(_PR_SET_CHILD_SUBREAPER, 1, 0, 0, 0)
-
-
-def _list_descendant_pids(root_pid: int) -> list[int]:
-    """Walk /proc/<pid>/task/<tid>/children to collect every live descendant
-    of `root_pid`. Used to chase down orphaned daemons (like `makemkvcon`'s
-    `guiserver` child) that double-fork into their own session and escape
-    the parent's process group, so a plain `killpg` would miss them. With
-    `_set_child_subreaper()` active, descendants re-parented away from
-    `root_pid` come back to our own pid and remain reachable from
-    /proc/self/task/.../children — so call this with `os.getpid()` after a
-    timeout, not just with the immediate child's pid."""
-    out: list[int] = []
-    stack = [root_pid]
-    while stack:
-        pid = stack.pop()
-        try:
-            with open(f"/proc/{pid}/task/{pid}/children") as f:
-                kids = f.read().split()
-        except OSError:
-            continue
-        for k in kids:
-            if k.isdigit():
-                kpid = int(k)
-                out.append(kpid)
-                stack.append(kpid)
-    return out
-
-
-def _run_metadata_tool(argv: list[str], timeout: float) -> subprocess.CompletedProcess[str] | None:
-    """Run a metadata-extraction tool with a timeout. Returns the completed
-    process on success, or None if the tool exceeds the timeout. A timeout
-    is reported on stderr and treated identically to "tool returned an
-    error" — the inspection continues without that tool's output. libbluray
-    in particular can hang indefinitely after `keydbcfg.c: No valid AACS
-    configuration files found` on some discs; without a timeout the whole
-    script hangs.
-
-    The child runs in its own process group (`start_new_session=True`).
-    On timeout we (1) snapshot every descendant from /proc, (2) `killpg`
-    the whole group, then (3) `SIGKILL` each enumerated descendant by PID.
-    Step 3 catches daemons that double-fork into their own session and
-    escape the original group — most importantly `makemkvcon`'s
-    `guiserver` child, which inherits our stdout/stderr pipes. Without
-    that explicit per-PID kill the guiserver keeps the pipes open after
-    its parent dies, and `proc.communicate()` blocks forever waiting for
-    EOF. The orphan also pins file descriptors against the loop-mount,
-    so `udisksctl unmount` later reports `target is busy` and the loop
-    device leaks.
-    """
-    proc = subprocess.Popen(
-        argv,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
-        encoding="utf-8", errors="replace",
-        start_new_session=True,
-    )
-    try:
-        stdout, stderr = proc.communicate(timeout=timeout)
-    except subprocess.TimeoutExpired:
-        try:
-            os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
-        except (ProcessLookupError, PermissionError):
-            pass
-        # Walk our *own* descendant tree, not the immediate child's. With
-        # `_set_child_subreaper()` set, orphans the child double-forked have
-        # been re-parented to us and are reachable from /proc/self.
-        for pid in _list_descendant_pids(os.getpid()):
-            try:
-                os.kill(pid, signal.SIGKILL)
-            except (ProcessLookupError, PermissionError):
-                pass
-        proc.communicate()
-        print(
-            f"warning: {argv[0]} exceeded {timeout:.0f}s; skipping its metadata",
-            file=sys.stderr,
-        )
-        return None
-    return subprocess.CompletedProcess(argv, proc.returncode, stdout, stderr)
+def _aacs_on_non_physical_source(source: Path, mount: Path) -> bool:
+    """libbluray (`bd_info`, `bd_list_titles`) and `makemkvcon` need an
+    optical drive to negotiate the AACS Drive Authentication handshake and
+    extract the disc's Volume ID from the BD-ROM Mark — a pre-recorded
+    zone that lives outside the user-data filesystem and is only readable
+    via SCSI MMC commands. ISOs (loop-mounted regular files) have no MMC
+    channel, and `dd` can't have captured the BD-ROM Mark in the first
+    place, so libaacs can't complete the handshake and instead stalls
+    indefinitely after warning that no `KEYDB.cfg` was found. When we
+    detect this combination — a non-block-device source with an `AACS/`
+    directory — we skip those tools rather than timing them out."""
+    if source.is_block_device():
+        return False
+    return (mount / "AACS").is_dir()
 
 
 def _extract_dvd_metadata(mount: Path) -> dict | None:
@@ -300,8 +213,12 @@ def _extract_dvd_metadata(mount: Path) -> dict | None:
     """
     if shutil.which("lsdvd") is None:
         return None
-    out = _run_metadata_tool(["lsdvd", "-x", "-Oy", str(mount)], timeout=30.0)
-    if out is None or out.returncode != 0 or "lsdvd = {" not in out.stdout:
+    out = subprocess.run(
+        ["lsdvd", "-x", "-Oy", str(mount)],
+        capture_output=True, text=True, check=False,
+        encoding="utf-8", errors="replace",
+    )
+    if out.returncode != 0 or "lsdvd = {" not in out.stdout:
         return None
     raw = out.stdout[out.stdout.index("lsdvd = {") + len("lsdvd = "):]
     try:
@@ -353,13 +270,24 @@ _BD_TITLE_RE = re.compile(
 )
 
 
-def _extract_bluray_metadata(mount: Path) -> dict | None:
+def _extract_bluray_metadata(source: Path, mount: Path) -> dict | None:
     """Parse BD disc and per-title metadata via bd_info + bd_list_titles."""
     if shutil.which("bd_info") is None or shutil.which("bd_list_titles") is None:
         return None
+    if _aacs_on_non_physical_source(source, mount):
+        print(
+            "warning: skipping libbluray on AACS-structured non-physical source "
+            "(no MMC channel for the AACS handshake)",
+            file=sys.stderr,
+        )
+        return None
 
-    info = _run_metadata_tool(["bd_info", str(mount)], timeout=30.0)
-    if info is None or info.returncode != 0:
+    info = subprocess.run(
+        ["bd_info", str(mount)],
+        capture_output=True, text=True, check=False,
+        encoding="utf-8", errors="replace",
+    )
+    if info.returncode != 0:
         return None
     disc: dict = {"tool": "libbluray"}
     toc: list[dict] = []
@@ -393,10 +321,14 @@ def _extract_bluray_metadata(mount: Path) -> dict | None:
     if toc:
         disc["toc"] = toc
 
-    titles_out = _run_metadata_tool(["bd_list_titles", "-l", str(mount)], timeout=60.0)
+    titles_out = subprocess.run(
+        ["bd_list_titles", "-l", str(mount)],
+        capture_output=True, text=True, check=False,
+        encoding="utf-8", errors="replace",
+    )
     titles: list[dict] = []
     main_title = None
-    if titles_out is not None and titles_out.returncode == 0:
+    if titles_out.returncode == 0:
         lines = titles_out.stdout.splitlines()
         i = 0
         while i < len(lines):
@@ -433,11 +365,11 @@ def _extract_bluray_metadata(mount: Path) -> dict | None:
     return disc
 
 
-def _extract_metadata(disc_type: str, mount: Path) -> dict | None:
+def _extract_metadata(disc_type: str, source: Path, mount: Path) -> dict | None:
     if disc_type == "dvd":
         return _extract_dvd_metadata(mount)
     if disc_type == "bluray":
-        return _extract_bluray_metadata(mount)
+        return _extract_bluray_metadata(source, mount)
     return None
 
 
@@ -490,14 +422,25 @@ def _extract_makemkv_metadata(source: Path, mount: Path) -> dict | None:
     """
     if shutil.which("makemkvcon") is None:
         return None
+    if _aacs_on_non_physical_source(source, mount):
+        print(
+            "warning: skipping makemkvcon on AACS-structured non-physical source "
+            "(no MMC channel for the AACS handshake)",
+            file=sys.stderr,
+        )
+        return None
     if source.is_block_device():
         spec = f"dev:{source}"
     elif source.is_file():
         spec = f"iso:{source}"
     else:
         spec = f"file:{mount}"
-    out = _run_metadata_tool(["makemkvcon", "-r", "info", spec], timeout=120.0)
-    if out is None or out.returncode != 0:
+    out = subprocess.run(
+        ["makemkvcon", "-r", "info", spec],
+        capture_output=True, text=True, check=False,
+        encoding="utf-8", errors="replace",
+    )
+    if out.returncode != 0:
         return None
     raw = _parse_makemkv_robot(out.stdout)
     if not raw["titles"]:
@@ -885,7 +828,7 @@ def render_text(
 def build_report(source: Path, mount: Path, compute: bool, include_metadata: bool = True) -> dict:
     disc_type = detect_disc_type(mount)
     fingerprint = v1.fingerprint(mount) if compute else None
-    metadata = _extract_metadata(disc_type, mount) if include_metadata else None
+    metadata = _extract_metadata(disc_type, source, mount) if include_metadata else None
     disc_library_xml = _read_disc_library_xml(disc_type, mount) if include_metadata else None
     metadata_makemkv = _extract_makemkv_metadata(source, mount) if include_metadata else None
     submission = _build_submission_view(source, mount)
@@ -917,7 +860,6 @@ def _inspect(source: Path, mount: Path, *, compute: bool, metadata: bool, as_jso
 
 
 def main(argv: list[str] | None = None) -> int:
-    _set_child_subreaper()
     parser = argparse.ArgumentParser(description="Compute the matrix256v1 fingerprint of a mounted optical disc, ISO image, or block device, and surface IMPLEMENTERS.md §5 submission metadata.")
     parser.add_argument("path", type=Path, help="Mounted disc directory (e.g. /media/user/DISC), ISO file (.iso), or block device (e.g. /dev/sr0)")
     parser.add_argument("--no-fingerprint", action="store_true", help="Skip SHA-256 computation; report metadata and submission view only")
