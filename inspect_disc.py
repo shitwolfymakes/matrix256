@@ -802,7 +802,7 @@ def render_text(
     if fingerprint is None:
         lines.append("Fingerprint: not computed (--no-fingerprint)")
     else:
-        lines.append(f"Fingerprint (matrix256v1, SHA-256): {fingerprint}")
+        lines.append(f"Fingerprint (matrix256v{v1.VERSION}): {fingerprint}")
 
     sub_lines = render_submission(submission or {})
     if sub_lines:
