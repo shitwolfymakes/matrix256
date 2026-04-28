@@ -90,6 +90,7 @@ The actual module handles symlinks, non-Unicode bytes, and error reporting per t
 - [`RATIONALE.md`](RATIONALE.md) — design rationale, prior-art comparison, why-not-X.
 - [`IMPLEMENTERS.md`](IMPLEMENTERS.md) — practical guidance for implementers (bridge discs, encoding, mount handling, submission metadata).
 - [`CORPUS.md`](CORPUS.md) — evaluation corpus of real discs with published `matrix256v1` digests.
+- [`CONFORMANCE_FIXTURES.md`](CONFORMANCE_FIXTURES.md) — synthetic test suite for implementations: deterministic filesystem fixtures with expected digests, runnable in CI without external data.
 - [`VENUES.md`](VENUES.md) — candidate publication venues for the spec.
 
 ## Repository tooling
