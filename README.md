@@ -100,6 +100,18 @@ The repo carries two stdlib-only Python files:
 - [`matrix256/v1.py`](matrix256/v1.py) — the reference implementation, factored into a reusable submodule. Importing code addresses it as `from matrix256 import v1`.
 - [`inspect_disc.py`](inspect_disc.py) — a CLI that mounts a disc (if needed), computes the matrix256v1 digest, and renders a MakeMKV-style metadata summary alongside the IMPLEMENTERS.md §5 submission view (source kind, filesystem driver, mount options, reader info). Useful for verifying spec compliance on real discs and for building an evaluation corpus.
 
+## Copyright and DRM
+
+matrix256 reads only filesystem metadata — file paths and file sizes — which are functional facts about how the disc is laid out. The video, audio, subtitle, and menu payloads are never read. AACS, CSS, BD+, and similar protection layers are never decrypted; no keys, libaacs, or libdvdcss are required to compute a fingerprint, because the filesystem layer that matrix256 reads is plaintext on every conformant optical disc by spec — the player itself needs that information to locate what to decrypt.
+
+That distinction is the one that matters for DMCA §1201 and its international counterparts. matrix256 does not bypass any technological protection measure: the metadata it reads is the metadata the disc explicitly publishes to anyone who mounts it. The output is a one-way SHA-256 digest that cannot be reversed to reconstruct the disc, and the pre-hash records (paths like `VTS_01_1.VOB` and integer file sizes) are mechanical artifacts of the authoring tools rather than authored works.
+
+This category of identifier has long-standing precedent. MusicBrainz Disc ID has computed and published TOC-derived hashes of audio CDs internationally for over two decades. AcoustID and Chromaprint do comparable things on the audio side. matrix256 sits in the same family: a hash of factual layout data, used as a stable key for community-curated metadata.
+
+A catalog keyed on matrix256 digests can record and exchange information *about* a pressing — title, year, region, edition notes, errata — without reproducing or transmitting the disc itself. The fingerprint provides no path to playback, copying, or DRM defeat: knowing a disc's digest grants no access to its contents that the holder did not already have.
+
+This section describes algorithm behavior, not legal conclusions. Operators of public lookup services should consult counsel for their jurisdiction.
+
 ## License
 
 TBD. The specification and reference implementation will be released under a permissive open-source license once the spec is frozen.
