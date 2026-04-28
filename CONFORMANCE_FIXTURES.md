@@ -26,7 +26,9 @@ For each fixture listed below:
 
 Equality (case-insensitive over hex characters, though the spec mandates lowercase) is the pass criterion. Any deviation indicates a divergence from the spec.
 
-Fixture construction is also implemented end-to-end in [`generate_fixtures.py`](generate_fixtures.py), which runs the Python reference implementation against each fixture and reports pass/fail. Implementers in other languages can read that script as the canonical specification of fixture construction, since the prose construction descriptions below are necessarily less precise than executable code.
+The expected digests are also published as machine-readable data in [`conformance_fixtures.json`](conformance_fixtures.json) alongside this document. Runners in any language should consume the JSON rather than parsing the markdown — the prose here is human documentation; the JSON is the canonical data.
+
+Fixture construction is implemented end-to-end in [`matrix256-py`](https://github.com/shitwolfymakes/matrix256-py) at `tests/generate_fixtures.py`, which constructs each fixture, hashes it with the Python reference implementation, and verifies the result against [`conformance_fixtures.json`](conformance_fixtures.json). Implementers in other languages can read that script as the canonical specification of fixture construction, since the prose construction descriptions below are necessarily less precise than executable code.
 
 ## Portability requirements
 
@@ -39,7 +41,7 @@ Every fixture is designed to be reproducible across operating systems and filesy
 
 ## Fixtures
 
-Twenty-five fixtures, every digest produced by the Python reference implementation in [`matrix256-py`](https://github.com/shitwolfymakes/matrix256-py) at `matrix256.v1`.
+Twenty-six fixtures, every digest produced by the Python reference implementation in [`matrix256-py`](https://github.com/shitwolfymakes/matrix256-py) at `matrix256.v1`.
 
 ### Fixture 1 — empty directory
 
@@ -396,13 +398,27 @@ a164865515f0f66b25cc4aff36e558a602d3db6caf62d41d1e830f9283b3dc8f
 
 **Notes.** Sort order under byte-wise comparison: `foo` (a prefix of the others, sorts first), then `foo.txt` (next byte after `foo` is `.` = `0x2E`), then `foobar` (next byte after `foo` is `b` = `0x62`). Catches implementations that sort component-wise (treating `.txt` as a separate token), that strip extensions, or that use a comparison function that misorders proper prefixes.
 
+### Fixture 26 — content irrelevance (bit-rot tolerance)
+
+**Purpose.** Verify the digest depends on file size, not on file contents, per [`SPEC.md`](SPEC.md) §2.3 and §2.5. A disc whose file bytes have suffered bit rot but whose filesystem metadata is intact must produce the same fingerprint as the pristine disc.
+
+**Construction.** One regular file at relative path `hello.txt` with contents `77 6F 72 6C 64 21` (the ASCII string `world!`, 6 bytes).
+
+**Expected matrix256v1 digest.**
+
+```
+00c8e12fff1075e74071d424a34ec9e89e2ffc96c5c4ec6a5bf7a3b5941b3324
+```
+
+**Notes.** Should match Fixture 3 exactly. Path is identical and size is identical (6 bytes); only the content bytes differ. Any implementation that hashes file contents — for example, mistakenly hashing each file's bytes alongside its path and size — will produce a different digest from Fixture 3 and will fail this fixture. Together with Fixture 3, this pair is the canonical test that the spec hashes filesystem metadata only.
+
 ## Implementation guidance
 
 To wire this suite into a non-Python implementation:
 
-1. **Implement a fixture-construction helper in your language.** It should produce the same on-disk state as the corresponding entry in [`generate_fixtures.py`](generate_fixtures.py). The Python script is the canonical reference for any case where this document's prose is ambiguous.
+1. **Implement a fixture-construction helper in your language.** It should produce the same on-disk state as the corresponding entry in [`matrix256-py`](https://github.com/shitwolfymakes/matrix256-py)'s `tests/generate_fixtures.py`. The Python script is the canonical reference for any case where this document's prose is ambiguous.
 2. **Run your `fingerprint` function against each constructed fixture.**
-3. **Compare each produced digest against the expected digest in this document.** Equality is the pass criterion.
+3. **Compare each produced digest against the expected digest in [`conformance_fixtures.json`](conformance_fixtures.json).** Equality is the pass criterion. Consume the JSON rather than parsing this markdown.
 4. **Wire the suite into your CI.** This becomes the implementation's Tier 1 conformance test: it runs unattended on every commit, has no external data dependencies, and proves the algorithmic core matches the spec without needing access to the full corpus.
 5. **Skip rather than work around incompatible fixtures.** If a fixture depends on a platform feature your CI environment doesn't have (Windows symlinks, Linux-only surrogate-escape, case-sensitive filesystems on default macOS), report a skip rather than mutate the fixture. A skip is a known limitation; a silent workaround is a divergence.
 

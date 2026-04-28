@@ -1,0 +1,169 @@
+{
+  "version": "matrix256v1",
+  "fixture_doc": "CONFORMANCE_FIXTURES.md",
+  "platform_requirements_taxonomy": {
+    "case_sensitive_fs": "filesystem distinguishes uppercase from lowercase in filenames",
+    "symlinks": "filesystem and runtime support symbolic-link creation",
+    "byte_preserving_fs": "filesystem stores filename bytes verbatim (no auto-NFC normalization at write time)",
+    "non_utf8_filenames": "filesystem accepts filenames whose bytes are not valid UTF-8 (POSIX)",
+    "long_component_names": "filesystem permits a single path component of at least 200 bytes"
+  },
+  "fixtures": [
+    {
+      "id": 1,
+      "name": "empty directory",
+      "expected_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "platform_requirements": []
+    },
+    {
+      "id": 2,
+      "name": "single zero-byte file",
+      "expected_digest": "576ada568edb673473287643d06ca9b763d81b712a080388fbf445bf580dab3d",
+      "platform_requirements": []
+    },
+    {
+      "id": 3,
+      "name": "single small ASCII file",
+      "expected_digest": "00c8e12fff1075e74071d424a34ec9e89e2ffc96c5c4ec6a5bf7a3b5941b3324",
+      "platform_requirements": []
+    },
+    {
+      "id": 4,
+      "name": "two files at root",
+      "expected_digest": "a7cde029efe3b62bb536d2eead4b0900409eea281230c0e1146dd0db645a2042",
+      "platform_requirements": []
+    },
+    {
+      "id": 5,
+      "name": "case-sensitive sort",
+      "expected_digest": "e99dec2b961d71942f740d942301fdb9e1268eeca6b21161dfaf5b7c253ed660",
+      "platform_requirements": ["case_sensitive_fs"]
+    },
+    {
+      "id": 6,
+      "name": "slash vs dash sort edge case",
+      "expected_digest": "82d1301cbc45799e538f19a52840b9ff5a9ca797d80c5e52b4d98c4750d2b5e3",
+      "platform_requirements": []
+    },
+    {
+      "id": 7,
+      "name": "nested directories",
+      "expected_digest": "8f2c64be52e682809a97f2e370a2638c10e3c3f9071eaa0bda3f7fc4c6c6eccb",
+      "platform_requirements": []
+    },
+    {
+      "id": 8,
+      "name": "sibling directories sort by full path",
+      "expected_digest": "ab44545fa7095c239cd8e9fa36eff237b1cc8e32c5126e98591b24250aa11871",
+      "platform_requirements": []
+    },
+    {
+      "id": 9,
+      "name": "only an empty subdirectory",
+      "expected_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "platform_requirements": []
+    },
+    {
+      "id": 10,
+      "name": "file plus an empty subdirectory",
+      "expected_digest": "00c8e12fff1075e74071d424a34ec9e89e2ffc96c5c4ec6a5bf7a3b5941b3324",
+      "platform_requirements": []
+    },
+    {
+      "id": 11,
+      "name": "only a symlink",
+      "expected_digest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "platform_requirements": ["symlinks"]
+    },
+    {
+      "id": 12,
+      "name": "symlink alongside a file",
+      "expected_digest": "1f99a83be1c9ac0d243b7937f15908a03ede98ffa24c18fcf6100fca66506df4",
+      "platform_requirements": ["symlinks"]
+    },
+    {
+      "id": 13,
+      "name": "Latin diacritics, NFC source",
+      "expected_digest": "afd2f606ae4f4e4d644cbb28ab2f1c5d46d6f98130304efd9941db17d6a91dcd",
+      "platform_requirements": []
+    },
+    {
+      "id": 14,
+      "name": "Latin diacritics, NFD source",
+      "expected_digest": "afd2f606ae4f4e4d644cbb28ab2f1c5d46d6f98130304efd9941db17d6a91dcd",
+      "platform_requirements": ["byte_preserving_fs"]
+    },
+    {
+      "id": 15,
+      "name": "Cyrillic filename",
+      "expected_digest": "c044182349eea94dff66a1ce2764e6f809cbf8893b2071d5906203b41fea21c0",
+      "platform_requirements": []
+    },
+    {
+      "id": 16,
+      "name": "Han filename",
+      "expected_digest": "339e0893d9d4aa8df81e9e7d671983f7befa124bd86416dc69697c32d8112787",
+      "platform_requirements": []
+    },
+    {
+      "id": 17,
+      "name": "Arabic filename",
+      "expected_digest": "9ec64191ddf011278744183c8830b3b7e7c6f35fbff37c66122f0ae0e7add033",
+      "platform_requirements": []
+    },
+    {
+      "id": 18,
+      "name": "emoji filename",
+      "expected_digest": "7c547ce5b89040b67d9cbf5c2ec5556090fdcfa8f3120b48a856c054769b7816",
+      "platform_requirements": []
+    },
+    {
+      "id": 19,
+      "name": "multi-script directory",
+      "expected_digest": "b7ce4f0d4e8cde3698b11edc79c49639b3f04cf88e128b0f1c3f0951843f7966",
+      "platform_requirements": []
+    },
+    {
+      "id": 20,
+      "name": "size boundaries",
+      "expected_digest": "ac2ee75612a4d578fe365711b2f8aef71e40b2f8c2abf212fa26308d857160e6",
+      "platform_requirements": []
+    },
+    {
+      "id": 21,
+      "name": "many small files",
+      "expected_digest": "a164865515f0f66b25cc4aff36e558a602d3db6caf62d41d1e830f9283b3dc8f",
+      "platform_requirements": []
+    },
+    {
+      "id": 22,
+      "name": "deeply nested file",
+      "expected_digest": "35997ed41f132aad8afc1e08a577090dff4aaa7bb23ffe5f874e879fbc38475f",
+      "platform_requirements": []
+    },
+    {
+      "id": 23,
+      "name": "long filename",
+      "expected_digest": "31013f1f14b4c55273b923a96047c43e157423625160c53dad1f7971de44db58",
+      "platform_requirements": ["long_component_names"]
+    },
+    {
+      "id": 24,
+      "name": "surrogate-escape filename byte",
+      "expected_digest": "8392ec1f2dec1510d58ade51d070394768a4fbbe917c677387901f1147dd439a",
+      "platform_requirements": ["non_utf8_filenames"]
+    },
+    {
+      "id": 25,
+      "name": "prefix and trailing-character sort",
+      "expected_digest": "599b5d5fd9d52740c6b40f134b260b52de60bed70ee60aa0536ee8474fc65bcc",
+      "platform_requirements": []
+    },
+    {
+      "id": 26,
+      "name": "content irrelevance (bit-rot tolerance)",
+      "expected_digest": "00c8e12fff1075e74071d424a34ec9e89e2ffc96c5c4ec6a5bf7a3b5941b3324",
+      "platform_requirements": []
+    }
+  ]
+}
