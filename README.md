@@ -4,7 +4,7 @@
 
 The name is an homage to the *matrix number* — the identifier etched into the metal stamper that presses every disc — with the `256` suffix pinning the hash function.
 
-The current and only active version of the algorithm is **matrix256v1**. The normative specification is [`SPEC.md`](SPEC.md); the reference implementation is [`matrix256/v1.py`](matrix256/v1.py).
+The current and only active version of the algorithm is **matrix256v1**. The normative specification is [`SPEC.md`](SPEC.md); reference implementations live in sibling repositories (see [Reference implementations](#reference-implementations) below).
 
 ## Motivation
 
@@ -28,10 +28,10 @@ Non-goals: tamper detection, per-byte content verification, robustness to disc d
 
 ## Quickstart
 
-Clone the repository and inspect a mounted disc, an ISO image, or a block device:
+Install one of the reference implementations (see [Reference implementations](#reference-implementations) below) and inspect a mounted disc, an ISO image, or a block device. Using the Python implementation:
 
 ```
-$ python inspect_disc.py /dev/sr0
+$ python -m matrix256 inspect /dev/sr0
 Source:    /dev/sr0
 Mount:     /media/user/MY_DISC
 Disc type: bluray
@@ -43,20 +43,25 @@ Submission metadata (filesystem view):
   Filesystem:     udf
   Mount device:   /dev/sr0
   Mount options:  ro,nosuid,nodev,relatime,iocharset=utf8
-  Reader:         inspect_disc.py · python 3.12.3 · Linux 6.8.0-110-generic
+  Reader:         matrix256-py · python 3.12.3 · Linux 6.8.0-110-generic
 
 Metadata (libbluray):
   Disc name:      BIG_BUCK_BUNNY
   ...
 ```
 
-`inspect_disc.py` accepts a mount-point directory, an ISO file (loop-mounted via `udisksctl`), or a block device (e.g. `/dev/sr0`). Anything it mounts itself, it unmounts on exit. Flags: `--no-fingerprint` to skip hashing, `--no-metadata` to skip the lsdvd / bd_info / makemkv summary, `--json` for a machine-readable report.
+Inspectors accept a mount-point directory, an ISO file, or a block device. For audio CDs, use a MusicBrainz Disc ID implementation (`libdiscid`, `python-discid`, or equivalent) — they have no filesystem and are out of scope for matrix256.
 
-For audio CDs, use a MusicBrainz Disc ID implementation (`libdiscid`, `python-discid`, or equivalent).
+## Reference implementations
 
-## Reference implementation (Python)
+Reference implementations are maintained in sibling repositories under the same owner:
 
-The full reference implementation is in [`matrix256/v1.py`](matrix256/v1.py). The core is small:
+- **Python** — `matrix256-py` (the authoritative reference for conformance testing).
+- **Rust** — `matrix256-rs`.
+- **JavaScript / TypeScript** — `matrix256-js`.
+- **Go** — `matrix256-go`.
+
+All implementations must produce byte-identical digests on the same input view; cross-implementation parity is verified against [`CONFORMANCE_FIXTURES.md`](CONFORMANCE_FIXTURES.md). The Python reference core is small:
 
 ```python
 import hashlib
@@ -82,7 +87,7 @@ def fingerprint(root: Path) -> str:
     return h.hexdigest()
 ```
 
-The actual module handles symlinks, non-Unicode bytes, and error reporting per the spec — see `matrix256/v1.py` and [`SPEC.md`](SPEC.md) for the normative behavior.
+The reference implementations handle symlinks, non-Unicode bytes, and error reporting per the spec — see the `matrix256-py` repository and [`SPEC.md`](SPEC.md) for the normative behavior.
 
 ## Documents in this repository
 
@@ -90,15 +95,7 @@ The actual module handles symlinks, non-Unicode bytes, and error reporting per t
 - [`RATIONALE.md`](RATIONALE.md) — design rationale, prior-art comparison, why-not-X.
 - [`IMPLEMENTERS.md`](IMPLEMENTERS.md) — practical guidance for implementers (bridge discs, encoding, mount handling, submission metadata).
 - [`CORPUS.md`](CORPUS.md) — evaluation corpus of real discs with published `matrix256v1` digests.
-- [`CONFORMANCE_FIXTURES.md`](CONFORMANCE_FIXTURES.md) — synthetic test suite for implementations: deterministic filesystem fixtures with expected digests, runnable in CI without external data.
-- [`VENUES.md`](VENUES.md) — candidate publication venues for the spec.
-
-## Repository tooling
-
-The repo carries two stdlib-only Python files:
-
-- [`matrix256/v1.py`](matrix256/v1.py) — the reference implementation, factored into a reusable submodule. Importing code addresses it as `from matrix256 import v1`.
-- [`inspect_disc.py`](inspect_disc.py) — a CLI that mounts a disc (if needed), computes the matrix256v1 digest, and renders a MakeMKV-style metadata summary alongside the IMPLEMENTERS.md §5 submission view (source kind, filesystem driver, mount options, reader info). Useful for verifying spec compliance on real discs and for building an evaluation corpus.
+- [`CONFORMANCE_FIXTURES.md`](CONFORMANCE_FIXTURES.md) — synthetic test suite for implementations: deterministic filesystem fixtures with expected digests (also available as [`conformance_fixtures.json`](conformance_fixtures.json) for machine consumption), runnable in CI without external data.
 
 ## Copyright and DRM
 
@@ -114,4 +111,4 @@ This section describes algorithm behavior, not legal conclusions. Operators of p
 
 ## License
 
-TBD. The specification and reference implementation will be released under a permissive open-source license once the spec is frozen.
+The specification, accompanying prose (RATIONALE, IMPLEMENTERS, CORPUS, CONFORMANCE_FIXTURES), and the reference implementation snippets in this repository are released under the [Creative Commons Attribution 4.0 International License](LICENSE) (CC BY 4.0). You are free to share and adapt this material for any purpose, including commercially, provided that attribution to the matrix256 project is preserved on reuse and on derivative works.
