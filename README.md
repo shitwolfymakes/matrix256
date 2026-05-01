@@ -1,5 +1,16 @@
 # matrix256: Reproducible Fingerprints for Optical Discs
 
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/shitwolfymakes/matrix256?style=flat&logo=github)](https://github.com/shitwolfymakes/matrix256/stargazers)
+[![Last commit](https://img.shields.io/github/last-commit/shitwolfymakes/matrix256)](https://github.com/shitwolfymakes/matrix256/commits)
+
+**Reference implementations:**
+[![Python](https://img.shields.io/badge/impl-matrix256--py-3776AB?logo=python&logoColor=white)](https://github.com/shitwolfymakes/matrix256-py)
+[![Rust](https://img.shields.io/badge/impl-matrix256--rs-000000?logo=rust&logoColor=white)](https://github.com/shitwolfymakes/matrix256-rs)
+[![JavaScript](https://img.shields.io/badge/impl-matrix256--js-F7DF1E?logo=javascript&logoColor=black)](https://github.com/shitwolfymakes/matrix256-js)
+[![Go](https://img.shields.io/badge/impl-matrix256--go-00ADD8?logo=go&logoColor=white)](https://github.com/shitwolfymakes/matrix256-go)
+[![Corpus](https://img.shields.io/badge/fixtures-matrix256--corpus-2496ED?logo=docker&logoColor=white)](https://github.com/shitwolfymakes/matrix256-corpus)
+
 **matrix256** is a reproducible SHA-256 fingerprint for optical discs and, more generally, for rooted filesystem trees. Given the same disc and the same filesystem view, any correct implementation produces a bit-identical digest regardless of operating system, reader hardware, or language runtime.
 
 The name is an homage to the *matrix number* — the identifier etched into the metal stamper that presses every disc — with the `256` suffix pinning the hash function.
