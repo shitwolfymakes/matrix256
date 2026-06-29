@@ -4,7 +4,7 @@ Companion document to the matrix256 specification. This document explains the de
 
 ## 1. The problem
 
-Optical disc catalogs — archival libraries, media servers, ripping pipelines, preservation databases — need to answer a deceptively simple question: *is this disc the same as that one?*
+Optical disc catalogs, be they archival libraries, media servers, ripping pipelines, preservation databases, need to answer a deceptively simple question: *is this disc the same as that one?*
 
 "Same" has multiple meanings, each with its own answer:
 
@@ -24,7 +24,7 @@ Title metadata is also lossy: entered by humans, language-dependent, ambiguous f
 
 ### 2.2 AACS Disc IDs
 
-Commercial Blu-ray discs carry a 20-byte AACS Disc ID assigned during mastering. Where present, this is a strong per-pressing identifier — but:
+Commercial Blu-ray discs carry a 20-byte AACS Disc ID assigned during mastering. Where present, this is a strong per-pressing identifier. That being said:
 
 - It requires libaacs and AACS keys to read, which are licensing-restricted.
 - It is absent on homemade and open-content discs.
@@ -39,13 +39,13 @@ The pydvdid algorithm is the closest prior art. It computes a 64-bit CRC over a 
 
 pydvdid is valuable prior art but has three structural problems:
 
-1. **Collision space.** 64 bits is inadequate for a global community identifier. At scale — millions of pressings across the history of commercial DVD — birthday-bound collisions are realistic.
+1. **Collision space.** 64 bits is inadequate for a global community identifier. At a scale of millions of pressings across the history of commercial DVD, birthday-bound collisions are realistic.
 
 2. **Windows API dependency.** The algorithm was reverse-engineered, not specified. When Microsoft silently changed the algorithm in Windows 10/11 (processing only a subset of the original file list), existing pydvdid implementations diverged from the new Windows behavior, producing a "win7" versus "win10" split that has not been resolved.
 
 3. **DVD-only.** pydvdid does not define behavior for Blu-ray, HD DVD, or any other optical format.
 
-The lookup service pydvdid was designed against — `metaservices.windowsmedia.com` — has been offline since Windows Media Center was discontinued in 2015. The Automatic Ripping Machine project's own CRC64 database (`1337server.pythonanywhere.com`) carries the flame, but it runs on one maintainer's free-tier PythonAnywhere account with no public data dump.
+The lookup service pydvdid was designed against (`metaservices.windowsmedia.com`) has been offline since Windows Media Center was discontinued in 2015. The Automatic Ripping Machine project's own CRC64 database (`1337server.pythonanywhere.com`) carries the flame, but it runs on one maintainer's free-tier PythonAnywhere account with no public data dump.
 
 ### 2.4 MusicBrainz Disc ID
 
@@ -62,7 +62,7 @@ A fingerprint that produces different digests for the same disc on different sys
 This means:
 
 - **No timestamps.** Filesystem timestamp handling varies across readers and operating systems. The win7/win10 split in pydvdid is exactly this failure mode. matrix256 reads no timestamps.
-- **No filesystem-layer metadata that varies by reader.** Permissions, ownership, link counts, extended attributes — none of these are included, because optical media readers synthesize them inconsistently.
+- **No filesystem-layer metadata that varies by reader.** Permissions, ownership, link counts, extended attributes, are excluded, because optical media readers synthesize them inconsistently.
 - **No locale-aware operations.** Sort order is byte-wise lexicographic. String comparison is byte equality.
 - **No implementation-dependent byte selection.** matrix256 does not read specific offsets within files, does not interpret file contents, and does not parse any on-disc structure beyond what the filesystem reader already does.
 
@@ -70,7 +70,7 @@ This means:
 
 The fingerprint is a function of bytes on the disc. It does not depend on the reader software, the host operating system, the optical drive, the mount options, or the implementing programming language.
 
-Different readers may retrieve different bytes for file *contents* — but file contents are not part of matrix256's input. Filesystem *metadata* (filenames, sizes, tree structure) is stable across readers because it is stored as small, well-defined fields in specified positions of the filesystem's on-disc descriptors, and every conformant filesystem reader returns the same values from those fields.
+Different readers may retrieve different bytes for file *contents* but file contents are not part of matrix256's input. Filesystem *metadata* (filenames, sizes, tree structure) is stable across readers because it is stored as small, well-defined fields in specified positions of the filesystem's on-disc descriptors, and every conformant filesystem reader returns the same values from those fields.
 
 ### 3.3 Structural identity, not content identity
 
@@ -126,7 +126,7 @@ File contents are stored in the large, scratch-prone outer regions of an optical
 
 Metadata-content hashing reads file contents, and is therefore sensitive to the bit patterns in those outer regions. A scratch on a damaged but identifiable disc can change or corrupt the hash.
 
-Tree-based hashing reads only filesystem metadata — filenames and sizes from directory entries. It is robust to content-layer damage: a scratched disc produces the same fingerprint as a pristine one, because the filesystem's *declared* sizes are unchanged regardless of whether the underlying sectors are readable.
+Tree-based hashing reads only filesystem metadata: filenames and sizes from directory entries. It is robust to content-layer damage: a scratched disc produces the same fingerprint as a pristine one, because the filesystem's *declared* sizes are unchanged regardless of whether the underlying sectors are readable.
 
 This is particularly important for archival use cases. Library discs handled for decades often have content-layer damage but intact filesystem metadata. matrix256 identifies them correctly.
 
@@ -144,7 +144,7 @@ File contents, by contrast, can differ subtly between readers: sector padding at
 
 ### 4.6 AACS compatibility without key material
 
-Commercial Blu-rays encrypt their STREAM directory contents under AACS, requiring libaacs and valid AACS keys to read. Metadata-content hashing for Blu-ray read playlist and clip-info files, which are not AACS-encrypted — so the v1 approach worked without AACS keys.
+Commercial Blu-rays encrypt their STREAM directory contents under AACS, requiring libaacs and valid AACS keys to read. Metadata-content hashing for Blu-ray read playlist and clip-info files, which are not AACS-encrypted, allowing the v1 approach to work without AACS keys.
 
 But tree-based hashing is cleaner still: it reads file *sizes* from the filesystem, without reading any file contents at all. The STREAM directory's M2TS files have readable sizes in the filesystem metadata regardless of AACS state. matrix256 therefore works on AACS-protected Blu-rays without any involvement of AACS licensing or key material, on DVD discs regardless of CSS protection, and on any future optical format using conventional filesystem-level content protection.
 
@@ -152,7 +152,7 @@ But tree-based hashing is cleaner still: it reads file *sizes* from the filesyst
 
 ### 5.1 Not tamper-resistant
 
-matrix256 is not a cryptographic proof of disc contents. An attacker who can craft a disc with a chosen filesystem layout can produce a chosen digest. This is a fundamental property of any content-addressable identifier and is not a security flaw — matrix256 is an identifier, not a signature.
+matrix256 is not a cryptographic proof of disc contents. An attacker who can craft a disc with a chosen filesystem layout can produce a chosen digest. This is a fundamental property of any content-addressable identifier and is not a security flaw. matrix256 is an identifier, not a signature.
 
 ### 5.2 Not a content hash
 
@@ -168,7 +168,7 @@ Filesystem metadata is small and concentrated on optical media, so this failure 
 
 ### 5.4 Does not fingerprint non-filesystem media
 
-LaserDiscs, audio CDs, and other optical media without a filesystem cannot be fingerprinted by matrix256. This is a scope decision, not a design flaw. The community has established identifiers for these formats — MusicBrainz Disc ID for audio CDs, catalog numbers via the LaserDisc Database (lddb.com) for LaserDiscs — that predate matrix256 and serve their respective purposes well.
+LaserDiscs, audio CDs, and other optical media without a filesystem cannot be fingerprinted by matrix256. This is a scope decision, not a design flaw. The community has established identifiers for these formats: MusicBrainz Disc ID for audio CDs, catalog numbers via the LaserDisc Database (lddb.com) for LaserDiscs, that predate matrix256 and serve their respective purposes well.
 
 ## 6. Empirical validation
 
@@ -186,11 +186,11 @@ Across this corpus, matrix256 exhibits:
 
 - **Zero collisions.** Every distinct physical pressing in the corpus produces a distinct digest.
 - **Reproducibility.** The same disc image produces the same digest across implementations and operating systems.
-- **Pressing sensitivity.** Sibling discs in multi-disc sets — Andromeda Season 1 discs 1–4, Silicon Valley Season 1 discs 1–2, Heat Director's Definitive Edition main-feature and bonus-features discs — all produce distinct digests.
+- **Pressing sensitivity.** Sibling discs in multi-disc sets such as Andromeda Season 1 discs 1–4, Silicon Valley Season 1 discs 1–2, Heat Director's Definitive Edition main-feature and bonus-features discs all produce distinct digests.
 - **Cross-medium differentiation.** Same-title DVD and Blu-ray pressings produce distinct digests, as expected given their entirely different file trees.
 - **Cross-edition differentiation.** Theatrical and extended cuts of the same film produce distinct digests.
 
-The corpus also surfaced incidental findings about optical disc authoring practices — cross-studio authoring templates (the "2 HDMV + 79 BD-J" pattern shared across Paramount, Universal, and Focus Features releases; the "5 HDMV + 86 BD-J" pattern shared across Fox, Paramount, and Lionsgate releases), display-name conventions (trademark glyph suffixes like "Blu-ray™" across Sony, Summit, and Paramount releases), and non-ASCII character handling in volume labels — which are documented in the corpus notes and inform future specification refinements.
+The corpus also surfaced incidental findings about optical disc authoring practices: cross-studio authoring templates (the "2 HDMV + 79 BD-J" pattern shared across Paramount, Universal, and Focus Features releases; the "5 HDMV + 86 BD-J" pattern shared across Fox, Paramount, and Lionsgate releases), display-name conventions (trademark glyph suffixes like "Blu-ray™" across Sony, Summit, and Paramount releases), and non-ASCII character handling in volume labels, all of which are documented in the corpus notes and inform future specification refinements.
 
 ## 7. Future work
 
@@ -210,7 +210,7 @@ No such service exists today. matrix256 is the primitive that makes one possible
 
 ### 7.3 Specification evolution
 
-If matrix256 proves insufficient in ways the corpus did not predict — systematic collisions in an archival catalog, newly introduced disc formats that don't fit the filesystem-based model — the response will be a new specification version (matrix256 version 3) published alongside version 2, not a modification of version 2. Existing digests remain stable regardless of future specification work.
+If matrix256 proves insufficient in ways the corpus did not predict (systematic collisions in an archival catalog, newly introduced disc formats that don't fit the filesystem-based model) the response will be a new specification version (matrix256 version 3) published alongside version 2, not a modification of version 2. Existing digests remain stable regardless of future specification work.
 
 ## 8. Acknowledgments
 
