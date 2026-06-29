@@ -6,13 +6,13 @@ In case of any conflict between this document and the specification, the specifi
 
 ## 1. Scope of this document
 
-The matrix256 algorithm operates on a rooted filesystem tree. It does not specify how an implementation arrives at that tree — mounting, filesystem-view selection, encoding handling, error recovery, and similar concerns are deliberately outside the normative algorithm so that the same digest can be computed from a mounted optical disc, a loop-mounted ISO image, an in-memory directory, a tar archive, or any other tree-shaped data source.
+The matrix256 algorithm operates on a rooted filesystem tree. It does not specify how an implementation arrives at that tree. Mounting, filesystem-view selection, encoding handling, error recovery, and similar concerns are deliberately outside the normative algorithm so that the same digest can be computed from a mounted optical disc, a loop-mounted ISO image, an in-memory directory, a tar archive, or any other tree-shaped data source.
 
 This document collects the operational concerns that fall outside the spec but matter in practice if you want your implementation's digests to agree with other implementations' digests on real-world media.
 
 ## 2. Bridge discs and filesystem-view selection
 
-Many commercial DVDs and some Blu-ray discs are mastered as **bridge discs** that expose the same underlying data through more than one filesystem — most commonly UDF and ISO 9660. The two filesystems can differ in trivially observable ways (case of filenames, presence of synthetic entries, directory ordering as enumerated by the reader) without any difference in the underlying pressing.
+Many commercial DVDs and some Blu-ray discs are mastered as **bridge discs** that expose the same underlying data through more than one filesystem (most commonly UDF and ISO 9660). The two filesystems can differ in trivially observable ways (case of filenames, presence of synthetic entries, directory ordering as enumerated by the reader) without any difference in the underlying pressing.
 
 Because matrix256 walks "the filesystem at the provided root", it produces a different digest for each filesystem view of the same physical media. Both digests are correct outputs of the algorithm against different inputs.
 
@@ -31,18 +31,18 @@ The corpus values published alongside this specification were generated under th
 - `udisksctl` (udisks2) for mount management
 - Linux kernel UDF and ISO 9660 drivers as shipped with the distribution
 
-Implementations should expect bit-identical digest agreement with the published corpus when reading the same physical media under similar conditions. Differences in mount behavior across operating systems, distributions, or kernel versions are exactly what §1.4 of the specification places outside the algorithm — but in practice the major desktop platforms agree on UDF view selection for commercial discs, and corpus reproduction has been verified across reasonable Linux configurations.
+Implementations should expect bit-identical digest agreement with the published corpus when reading the same physical media under similar conditions. Differences in mount behavior across operating systems, distributions, or kernel versions are exactly what §1.4 of the specification places outside the algorithm, but in practice the major desktop platforms agree on UDF view selection for commercial discs, and corpus reproduction has been verified across reasonable Linux configurations.
 
 If you observe a digest mismatch against the corpus on a disc you can read cleanly, the most likely causes are, in rough order of frequency:
 
 1. Reading a different filesystem view than the corpus generator did (see §2 above).
 2. A filesystem reader that synthesizes additional entries (e.g., a `.Trashes` or `System Volume Information` directory injected by an operating system that has touched the medium).
 3. A path-decoding bug in the implementation (NFD vs. NFC, or a non-Unicode filename handled differently).
-4. A genuine discrepancy in the physical media — distinct pressings of the same title with subtly different file layouts.
+4. A genuine discrepancy in the physical media, e.g. distinct pressings of the same title with subtly different file layouts.
 
 ## 4. Non-disc filesystems
 
-matrix256 is filesystem-agnostic. Implementations targeting USB drives, archive files, in-memory directory trees, or other rooted filesystem inputs need no special handling — the algorithm is the same. The optical-disc framing in `SPEC.md` reflects the primary intended use case, not a constraint on inputs.
+matrix256 is filesystem-agnostic. Implementations targeting USB drives, archive files, in-memory directory trees, or other rooted filesystem inputs need no special handling, the algorithm is the same. The optical-disc framing in `SPEC.md` reflects the primary intended use case, not a constraint on inputs.
 
 For non-disc inputs, the same caveats apply:
 
@@ -62,4 +62,4 @@ Recommended submission fields, in addition to the digest itself:
 - Whether the source was a physical disc, an ISO image, or another filesystem source.
 - Optionally, the operating system and reader software used to enumerate the filesystem, for audit purposes.
 
-The catalog layer — not the algorithm — is responsible for collapsing multiple per-view fingerprints into a single logical-pressing identity.
+The catalog layer is responsible for collapsing multiple per-view fingerprints into a single logical-pressing identity.
