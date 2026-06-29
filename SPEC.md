@@ -4,7 +4,7 @@
 
 matrix256 is a reproducible cryptographic fingerprint for optical discs. Given the same disc, any correct implementation of this specification produces a bit-identical SHA-256 digest regardless of operating system, reader, optical drive, or language runtime.
 
-The name is an homage to the *matrix number* — the identifier etched into the metal stamper that presses every disc — with the `256` suffix pinning the hash function.
+The name is an homage to the *matrix number* (the identifier etched into the metal stamper that presses every disc) with the `256` suffix pinning the hash function.
 
 ## 1. Scope
 
